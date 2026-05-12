@@ -113,7 +113,7 @@
       var v = base;
       for (var i = 0; i <= 12; i++) {
         arr.push(Math.round(v));
-        v = v + Math.min(v * monthlyGrowth, largestPlatformAtStart);
+        v = v + Math.min(v * monthlyGrowth, 2*largestPlatformAtStart);
       }
       platformSeries[m.key] = arr;
     });
