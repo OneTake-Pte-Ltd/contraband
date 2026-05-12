@@ -1397,23 +1397,23 @@
   }
 
   function buildResultFooter() {
-    var legalHtml = '<p>By signing up, I agree to the <a href="https://www.onetake.ai/terms-of-service" target="_blank">Terms of Service &amp; Refund Policy</a> and the <a href="https://www.onetake.ai/privacy-policy" target="_blank">Privacy Policy</a>.</p>'
+    var legalHtml = '<p>By signing up, I agree to the <a ="https://www.onetake.ai/terms-of-service" target="_blank">Terms of Service &amp; Refund Policy</a> and the <a ="https://www.onetake.ai/privacy-policy" target="_blank">Privacy Policy</a>.</p>'
       + '<p><strong>What is OneTake?</strong></p>'
-      + '<p><strong>OneTake AI turns raw videos into professional presentations.</strong> To help experts, trainers, coaches and authors create and publish their video content, we\'ve created <a href="https://www.onetake.ai" target="_blank">OneTake AI, the first all-in-one video editing software powered by artificial intelligence</a>.</p>'
-      + '<p>Useful links: <a href="https://www.onetake.ai/blog" target="_blank">OneTake\'s Blog</a> · <a href="https://welove.onetake.ai/" target="_blank">Wall of Love (reviews)</a> · <a href="https://docs.onetake.ai/en/" target="_blank">FAQ &amp; Docs</a></p>'
+      + '<p><strong>OneTake AI turns raw videos into professional presentations.</strong> To help experts, trainers, coaches and authors create and publish their video content, we\'ve created <a ="https://www.onetake.ai" target="_blank">OneTake AI, the first all-in-one video editing software powered by artificial intelligence</a>.</p>'
+      + '<p>Useful links: <a ="https://www.onetake.ai/blog" target="_blank">OneTake\'s Blog</a> · <a ="https://welove.onetake.ai/" target="_blank">Wall of Love (reviews)</a> · <a ="https://docs.onetake.ai/en/" target="_blank">FAQ &amp; Docs</a></p>'
       + '<p><strong>Who came up with the idea?</strong></p>'
       + '<p>Sébastien Night, our CEO, is the founder of the Free Entrepreneurs Movement — an organization supporting over 20,000 entrepreneur clients and 300,000 supporters in 41 countries since 2010. <strong>After producing and editing thousands of videos himself over 15+ years, Sébastien decided to create a tool that would be both incredibly powerful and utterly easy to use: OneTake.</strong></p>'
-      + '<p><span>To contact Sébastien and his team,</span> <a href="https://www.onetake.ai/contact" target="_blank">simply click here</a></p>';
+      + '<p><span>To contact Sébastien and his team,</span> <a ="https://www.onetake.ai/contact" target="_blank">simply click here</a></p>';
 
     return h('footer', null,
       h('div', { className: 'footer-cta' },
         h('div', { className: 'footer-cta-text' },
           h('div', { className: 'eyebrow', textContent: 'Next step' }),
-          h('h3', { textContent: 'Now go drop your results in the comments under Video 1.' }),
-          h('p', { textContent: 'Tell me what you found. I read every comment, and Video 2 will show you exactly which of the five pillars to start with — given your specific numbers.' })
+          h('h3', { textContent: 'Now go share your results in the comments under Video 1.' }),
+          h('p', { textContent: 'Tell me what you found. I read every comment, and Video 2 will show you exactly which of the five pillars to start with — given your specific projections.' })
         ),
         h('a', {
-          href: 'https://try.onetake.ai/bootcamps/ehv/vpl1-10k.html',
+          href: 'https://try.onetake.ai/bootcamps/ehv/vpl1-10k/#comment-questions',
           className: 'footer-cta-btn',
           textContent: 'Share my result →',
         })
