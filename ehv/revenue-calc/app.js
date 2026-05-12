@@ -103,7 +103,7 @@
     var active = activePlatformsList(s);
 
     // Per-platform series: 13 points (month 0 → 12)
-    var largestPlatformAtStart = Math.max(1, active.reduce(function (mx, m) {
+    var largestPlatformAtStart = Math.max(1, s.hoursPerWeek*10, active.reduce(function (mx, m) {
       return Math.max(mx, s.platforms[m.key].followers || 0);
     }, 0));
     var platformSeries = {};
