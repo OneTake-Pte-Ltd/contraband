@@ -1028,7 +1028,7 @@
         h('span', { textContent: name }),
         '?'
       ),
-      h('p', { className: 'question-sub', textContent: "So you can come back to your number later, and so I can send you the next videos in the bootcamp. No drip, no nonsense — you can unsubscribe in one click." }),
+      h('p', { className: 'question-sub', textContent: "So I can send you the next videos in the bootcamp, where I explain how to become a High-Value Expert." }),
       h('div', { style: { marginTop: '32px', maxWidth: '520px' } }, input)
     );
     return shell;
