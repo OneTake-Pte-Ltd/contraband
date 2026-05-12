@@ -3,7 +3,7 @@
   'use strict';
 
   // ── Proxy URL (replace with your Bunny Edge Script endpoint) ──────────────
-  var PROXY_URL = 'https://REPLACE_WITH_YOUR_BUNNY_EDGE_SCRIPT_URL/track';
+  var PROXY_URL = 'https://userlist-proxy-for-launch-opt-ins-9yd8d.bunny.run/track';
 
   // ── Constants ─────────────────────────────────────────────────────────────
   var PLATFORM_META = [
@@ -19,7 +19,7 @@
 
   var ACTIVITY_OPTIONS = [
     'Coaching', 'Consulting', 'Online courses', 'In-person training',
-    'Books', 'Masterminds', 'Software', 'Therapy', 'E-commerce', 'Other',
+    'Books', 'Mastermind groups', 'Software', 'Therapy', 'E-commerce', 'Other',
   ];
 
   var CURR = {
@@ -61,7 +61,7 @@
     activityOther: '',
     activitySecondary: [],
     platforms: defaultPlatforms(),
-    hoursPerWeek: 0,
+    hoursPerWeek: 1,
     priceLow: 50,
     priceHigh: 1000,
     currency: 'EUR',
@@ -115,14 +115,25 @@
       platformSeries[m.key] = arr;
     });
 
-    // Email series
+    // Email series (own growth + 25% of new long-form subs + 10% of new short-form subs)
     var emailActive = s.platforms.email.active;
     var currentEmail = emailActive ? (s.platforms.email.followers || 0) : 0;
     var emailSeries = [];
-    var ev = Math.max(currentEmail, 1);
+    var ev = emailActive ? Math.max(currentEmail, 1) : currentEmail;
     for (var i = 0; i <= 12; i++) {
       emailSeries.push(Math.round(ev));
-      ev = ev * (1 + monthlyGrowth);
+      if (i < 12) {
+        var ownGrowth = emailActive ? ev * monthlyGrowth : 0;
+        var socialConversions = 0;
+        PLATFORM_META.forEach(function (m) {
+          if (s.platforms[m.key].active && platformSeries[m.key]) {
+            var newSubs = platformSeries[m.key][i + 1] - platformSeries[m.key][i];
+            if (m.kind === 'long') socialConversions += newSubs * 0.25;
+            else if (m.kind === 'short') socialConversions += newSubs * 0.10;
+          }
+        });
+        ev = ev + ownGrowth + socialConversions;
+      }
     }
 
     // Revenue series (driven by email list × b2b mult)
@@ -142,11 +153,17 @@
     var social0 = socialSeries[0];
     var targetEmail = Math.max(social0, 2000);
 
+    var priceLow = s.priceLow || 1;
+    function roundUpToPrice(v) {
+      if (!priceLow || priceLow <= 0) return v;
+      return Math.ceil(v / priceLow) * priceLow;
+    }
+
     return {
-      currentMonthlyRevenue: today.revenue,
-      targetMonthlyRevenue: m12.revenue,
-      targetPersonalIncome: m12.personal,
-      annualRevenue: m12.revenue * 12,
+      currentMonthlyRevenue: roundUpToPrice(today.revenue),
+      targetMonthlyRevenue: roundUpToPrice(m12.revenue),
+      targetPersonalIncome: roundUpToPrice(m12.personal),
+      annualRevenue: roundUpToPrice(m12.revenue * 12),
       currentEmail: currentEmail,
       targetEmail: targetEmail,
       emailGap: Math.max(0, targetEmail - currentEmail),
@@ -176,24 +193,31 @@
     if (proj.longForm < 3 && s.hoursPerWeek >= 3) {
       issues.push({
         key: 'longform',
-        headline: "You're under-publishing on long-form.",
-        body: 'You publish ' + proj.longForm + ' long-form pieces per week across YouTube, LinkedIn, and Podcast. With ' + s.hoursPerWeek + 'h available, you have capacity for ' + Math.min(s.hoursPerWeek, 7) + ". The gap is what your competitors are filling.",
-        lever: 'Pick one long-form channel. Commit to weekly.',
+        headline: "You're under-publishing on longer content.",
+        body: 'You publish ' + proj.longForm + ' longer content pieces per week across YouTube, LinkedIn, and Podcast. With ' + s.hoursPerWeek + 'h available, you have capacity for ' + Math.min(s.hoursPerWeek, 7) + ". The gap is what your competitors are filling.",
+        lever: 'Pick one longer content channel. Commit to weekly.',
       });
     }
-    if (s.priceHigh > 0 && s.priceHigh < 1500 && s.audience === 'B2B') {
+    if (s.priceHigh > 0 && s.audience === 'B2B' && s.priceHigh < 2500) {
       issues.push({
         key: 'price',
         headline: 'Your prices are below market for B2B.',
         body: 'Your high ticket is ' + fmtMoney(s.priceHigh, 'EUR') + '. B2B buyers expect — and pay — between €3,000 and €15,000 for a premium engagement. You are pricing yourself out of your real market.',
         lever: 'Raise your high ticket by 2.5× on the next cycle.',
       });
+    } else if (s.priceHigh > 0 && s.audience === 'B2C' && s.priceHigh < 1000) {
+      issues.push({
+        key: 'price',
+        headline: "Your highest ticket is a lever you haven't pulled.",
+        body: 'Your high ticket is ' + fmtMoney(s.priceHigh, 'EUR') + ". Most B2C expert businesses unlock their next revenue level by introducing one premium offer above €1,000.",
+        lever: 'Design one offer at or above €1,000. A workshop, a mastermind, a done-with-you program.',
+      });
     }
     if (s.platforms.tiktok.active && s.platforms.tiktok.freq > 4 && proj.longForm < 2) {
       issues.push({
         key: 'shortform',
         headline: "You're feeding the algorithm, not your business.",
-        body: "Short-form is busy work. It builds reach for the platform. Long-form builds trust for you.",
+        body: "Short content is busy work. It builds reach for the platform. Longer content builds trust for you.",
         lever: 'Cut TikTok to twice a week. Reinvest the hours.',
       });
     }
@@ -201,7 +225,7 @@
       issues.push({
         key: 'hours',
         headline: "You're starving your business of time.",
-        body: 'You allocate ' + s.hoursPerWeek + "h/week to content. That's barely enough for one long-form post. Your ceiling is set here.",
+        body: 'You allocate ' + s.hoursPerWeek + "h/week to content. That's barely enough for one longer content post. Your ceiling is set here.",
         lever: 'Carve out one untouchable half-day per week. Non-negotiable.',
       });
     }
@@ -367,7 +391,7 @@
       firstName: '', email: '', audience: 'B2C',
       activity: '', activityOther: '', activitySecondary: [],
       platforms: defaultPlatforms(),
-      hoursPerWeek: 0, priceLow: 50, priceHigh: 1000, currency: 'EUR',
+      hoursPerWeek: 1, priceLow: 50, priceHigh: 1000, currency: 'EUR',
     }, (function () {
       var p = new URLSearchParams(window.location.search);
       return {
@@ -715,7 +739,7 @@
 
     var cards = ALL_PLATFORMS.map(function (m) {
       var active = state.platforms[m.key].active;
-      var kindLabel = m.kind === 'owned' ? 'owned audience' : m.kind === 'long' ? 'long-form' : 'short-form';
+      var kindLabel = m.kind === 'owned' ? 'owned audience' : m.kind === 'long' ? 'longer content' : 'short content';
       var card = h('button', {
         className: 'card' + (active ? ' selected' : ''),
         onClick: function () {
@@ -755,7 +779,7 @@
     });
 
     var rows = activePlatforms.map(function (m) {
-      var kindLabel = m.kind === 'owned' ? 'owned audience' : m.kind === 'long' ? 'long-form' : 'short-form';
+      var kindLabel = m.kind === 'owned' ? 'owned audience' : m.kind === 'long' ? 'longer content' : 'short content';
       var input = h('input', {
         type: 'number', className: 'num-input',
         min: 0, placeholder: '0',
@@ -848,11 +872,25 @@
       );
     }
 
+    var cadenceContainer = h('div', { style: { marginTop: '32px', maxWidth: '820px' } });
+    if (activeSocial.length > 0) {
+      append(cadenceContainer,
+        h('div', { className: 'eyebrow', style: { paddingBottom: '10px' }, textContent: 'Per week' }),
+        socialRows
+      );
+    }
+    if (emailActive) {
+      append(cadenceContainer,
+        h('div', { className: 'eyebrow', style: { paddingTop: '24px', paddingBottom: '10px' }, textContent: 'Per month' }),
+        emailRow
+      );
+    }
+
     var body = shell._body;
     append(body,
       h('h1', { className: 'question-title', textContent: 'How often do you actually publish?' }),
       h('p', { className: 'question-sub', textContent: "Be honest. Not the cadence you wish you had — the one you've sustained for the past month." }),
-      h('div', { style: { marginTop: '32px', maxWidth: '820px' } }, socialRows, emailRow || [])
+      cadenceContainer
     );
     return shell;
   }
@@ -990,7 +1028,7 @@
         h('span', { textContent: name }),
         '?'
       ),
-      h('p', { className: 'question-sub', textContent: "One email. So you can come back to your number later, and so I can send you the next videos in the bootcamp. No drip, no nonsense — you can unsubscribe in one click." }),
+      h('p', { className: 'question-sub', textContent: "So you can come back to your number later, and so I can send you the next videos in the bootcamp. No drip, no nonsense — you can unsubscribe in one click." }),
       h('div', { style: { marginTop: '32px', maxWidth: '520px' } }, input)
     );
     return shell;
@@ -1206,7 +1244,7 @@
     var endTotal = active.reduce(function (a, m) { return a + proj.platformSeries[m.key][12]; }, 0) +
       (s.platforms.email.active ? proj.emailSeries[12] : 0);
 
-    var svg = svgEl('svg', { width: W, height: H, style: 'display:block;width:100%;overflow:visible' });
+    var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', style: 'display:block;width:100%;overflow:visible' });
     svg.appendChild(buildGridlines(W, H));
 
     // Platform lines
@@ -1284,7 +1322,7 @@
     var values = proj.revenue.map(function (d) { return d.revenue; });
     var scaleMax = Math.max.apply(null, values.concat([1]));
 
-    var svg = svgEl('svg', { width: W, height: H, style: 'display:block;width:100%;overflow:visible' });
+    var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', style: 'display:block;width:100%;overflow:visible' });
     svg.appendChild(buildGridlines(W, H));
 
     var linePath = buildSparklinePath(values, W, H, scaleMax);
@@ -1371,7 +1409,7 @@
       h('div', { className: 'footer-cta' },
         h('div', { className: 'footer-cta-text' },
           h('div', { className: 'eyebrow', textContent: 'Next step' }),
-          h('h3', { textContent: 'Now go drop your number in the comments under Video 1.' }),
+          h('h3', { textContent: 'Now go drop your results in the comments under Video 1.' }),
           h('p', { textContent: 'Tell me what you found. I read every comment, and Video 2 will show you exactly which of the five pillars to start with — given your specific numbers.' })
         ),
         h('a', {
