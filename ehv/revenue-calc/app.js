@@ -99,10 +99,13 @@
   function computeProjection(s) {
     var hours = s.hoursPerWeek || 0;
     var monthlyGrowth = Math.min(hours * 0.08, 0.25); // capped at 25%/month
-    var b2bMult = s.audience === 'B2B' ? 2.5 : 1;
+    var b2bMult = s.audience === 'B2B' ? 1.6 : 1;
     var active = activePlatformsList(s);
 
     // Per-platform series: 13 points (month 0 → 12)
+    var largestPlatformAtStart = Math.max(1, active.reduce(function (mx, m) {
+      return Math.max(mx, s.platforms[m.key].followers || 0);
+    }, 0));
     var platformSeries = {};
     active.forEach(function (m) {
       var base = Math.max(s.platforms[m.key].followers || 0, 1);
@@ -110,7 +113,7 @@
       var v = base;
       for (var i = 0; i <= 12; i++) {
         arr.push(Math.round(v));
-        v = v * (1 + monthlyGrowth);
+        v = v + Math.min(v * monthlyGrowth, largestPlatformAtStart);
       }
       platformSeries[m.key] = arr;
     });
@@ -1233,16 +1236,17 @@
     var W = 460, H = 200;
     var active = activePlatformsList(s);
 
+    var showEmailLine = s.platforms.email.active || proj.emailSeries[12] > 0;
     var allVals = active.reduce(function (acc, m) {
       return acc.concat(proj.platformSeries[m.key]);
     }, []);
-    if (s.platforms.email.active) allVals = allVals.concat(proj.emailSeries);
+    if (showEmailLine) allVals = allVals.concat(proj.emailSeries);
     var scaleMax = Math.max.apply(null, allVals.concat([1]));
 
     var startTotal = active.reduce(function (a, m) { return a + proj.platformSeries[m.key][0]; }, 0) +
-      (s.platforms.email.active ? proj.emailSeries[0] : 0);
+      (showEmailLine ? proj.emailSeries[0] : 0);
     var endTotal = active.reduce(function (a, m) { return a + proj.platformSeries[m.key][12]; }, 0) +
-      (s.platforms.email.active ? proj.emailSeries[12] : 0);
+      (showEmailLine ? proj.emailSeries[12] : 0);
 
     var svg = svgEl('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, preserveAspectRatio: 'none', style: 'display:block;width:100%;overflow:visible' });
     svg.appendChild(buildGridlines(W, H));
@@ -1258,7 +1262,7 @@
     });
 
     // Email line (thick, dark)
-    if (s.platforms.email.active) {
+    if (showEmailLine) {
       var d = buildSparklinePath(proj.emailSeries, W, H, scaleMax);
       var path = svgEl('path', {
         d: d, fill: 'none', stroke: '#1a1a1a',
@@ -1269,7 +1273,7 @@
 
     // Legend
     var legendItems = [];
-    if (s.platforms.email.active) {
+    if (showEmailLine) {
       legendItems.push(h('div', { className: 'legend-item' },
         h('span', { className: 'legend-swatch', style: { background: '#1a1a1a', height: '2.4px' } }),
         h('span', null,
@@ -1300,11 +1304,11 @@
       h('div', { className: 'chart-wrap' },
         svg,
         h('div', { className: 'chart-axis' },
-          h('span', { textContent: 'Mo 0' }),
-          h('span', { textContent: 'Mo 3' }),
-          h('span', { textContent: 'Mo 6' }),
-          h('span', { textContent: 'Mo 9' }),
-          h('span', { textContent: 'Mo 12' })
+          h('span', { textContent: 'Month 0' }),
+          h('span', { textContent: 'Month 3' }),
+          h('span', { textContent: 'Month 6' }),
+          h('span', { textContent: 'Month 9' }),
+          h('span', { textContent: 'Month 12' })
         )
       ),
       h('div', { className: 'chart-legend' }, legendItems),
@@ -1355,11 +1359,11 @@
       h('div', { className: 'chart-wrap' },
         svg,
         h('div', { className: 'chart-axis' },
-          h('span', { textContent: 'Mo 0' }),
-          h('span', { textContent: 'Mo 3' }),
-          h('span', { textContent: 'Mo 6' }),
-          h('span', { textContent: 'Mo 9' }),
-          h('span', { textContent: 'Mo 12' })
+          h('span', { textContent: 'Month 0' }),
+          h('span', { textContent: 'Month 3' }),
+          h('span', { textContent: 'Month 6' }),
+          h('span', { textContent: 'Month 9' }),
+          h('span', { textContent: 'Month 12' })
         )
       ),
       h('p', { className: 'small', style: { marginTop: '10px', lineHeight: '1.55' } },
