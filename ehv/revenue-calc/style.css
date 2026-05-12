@@ -1,0 +1,100 @@
+:root {
+  --bg: #fafaf7;
+  --ink: #1a1a1a;
+  --rust: #9c4a1c;
+  --warm: #f2efe8;
+  --border: rgba(26,26,26,0.18);
+  --border-light: rgba(26,26,26,0.12);
+  --text-dim: rgba(26,26,26,0.65);
+  --text-dimmer: rgba(26,26,26,0.55);
+  --serif: "Source Serif 4", Georgia, serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Helvetica, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+#app { min-height: 100vh; }
+
+/* ── Range inputs ─────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(26,26,26,0.15);
+  height: 3px;
+  border-radius: 0;
+  cursor: pointer;
+  width: 100%;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rust);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--ink);
+  pointer-events: all;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--rust);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 0 1px var(--ink);
+  pointer-events: all;
+  border: none;
+}
+
+/* Number inputs – hide spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* Focus */
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 2px;
+}
+
+/* ── Typography helpers ───────────────────────────────── */
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+.small-mono {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+}
+.small { font-size: 11px; color: rgba(26,26,26,0.6); }
+
+/* ── Progress bar ─────────────────────────────────────── */
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.progress-bar { display: flex; gap: 4px; }
+.progress-seg { flex: 1; height: 3px; background: rgba(26,26,26,0.15); }
+.progress-seg.done { background: var(--ink); }
+
+/* ── Step shell ───────────────────────────────────────── */
