@@ -24,7 +24,7 @@
 
   var CURR = {
     EUR: { sym: '€', rate: 1 },
-    USD: { sym: '$', rate: 1.08 },
+    USD: { sym: '$', rate: 1.17 },
   };
 
   var STEPS = [
@@ -63,7 +63,7 @@
     platforms: defaultPlatforms(),
     hoursPerWeek: 1,
     priceLow: 50,
-    priceHigh: 1000,
+    priceHigh: 2000,
     currency: 'EUR',
   };
 
@@ -925,7 +925,7 @@
     var body = shell._body;
     append(body,
       h('h1', { className: 'question-title', textContent: 'How many hours a week do you have available for creating content?' }),
-      h('p', { className: 'question-sub', textContent: 'Not aspirational hours. Real hours, after kids, clients, and life. This is the single number that caps everything else.' }),
+      h('p', { className: 'question-sub', textContent: 'Not aspirational hours. Real hours: after kids, clients, and life. How much time do you actually have to work on communicating and sharing your knowledge?' }),
       h('div', { style: { marginTop: '48px', maxWidth: '760px' } },
         h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' } },
           bigNum,
@@ -1169,7 +1169,7 @@
     // Hero
     var heroAmtEl = h('em', { style: { fontStyle: 'italic', color: '#9c4a1c' } }, '—');
     var heroAmtSuffix = h('span', { style: { fontSize: '0.6em', fontStyle: 'normal', color: '#9c4a1c' }, textContent: '/mo' });
-    var personalEl = h('strong', null, '—/month');
+    var personalEl = h('strong', null, '— per month');
 
     var hero = h('div', { className: 'r-hero' },
       h('div', null,
