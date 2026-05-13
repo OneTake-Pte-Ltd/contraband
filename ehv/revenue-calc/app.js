@@ -141,7 +141,8 @@
 
     // Revenue series (driven by email list × b2b mult)
     var revenue = emailSeries.map(function (email, i) {
-      var r = email * 1 * b2bMult;
+    var hoursFloor = [0, 3250, 5500, 7500][Math.min(s.hoursPerWeek, 3)] || 0;
+    var r = Math.max(email * 1 * b2bMult, hoursFloor* i/12);
       return { month: i, revenue: Math.round(r), personal: Math.round(r * 0.4) };
     });
 
