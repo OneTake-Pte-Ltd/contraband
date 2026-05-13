@@ -135,7 +135,7 @@
             else if (m.kind === 'short') socialConversions += newSubs * 0.10;
           }
         });
-        ev = ev + ownGrowth + socialConversions;
+        ev = ev + ownGrowth + socialConversions + 100* hours;
       }
     }
 
