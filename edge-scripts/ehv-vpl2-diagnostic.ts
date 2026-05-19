@@ -9,9 +9,8 @@ import process from "node:process";
  *   POST /track     — fire DiagnosticCompleted event to UserList
  *
  * Environment variables:
- *   ANTHROPIC_API_KEY   — Anthropic API key
- *   USERLIST_PUSH_KEY   — UserList Push API key  (Authorization: Push ...)
- *   USERLIST_REST_KEY   — UserList REST API key  (Authorization: Bearer ...)
+ *   ANTHROPIC_API_KEY  — Anthropic API key
+ *   USERLIST_PUSH_KEY  — UserList Push API key  (Authorization: Push ...)
  */
 
 const ALLOWED_ORIGIN = "https://contraband.onetake.ai";
@@ -185,53 +184,20 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
   return json(diagnosis, 200, origin);
 }
 
-// ── UserList helpers (matching VPL1 pattern) ────────────────
-async function findUser(
-  email: string,
-  restKey: string
-): Promise<{ identifier: string; email: string } | null> {
-  const url = "https://api.userlist.com/v2/users?filter[email_address]=" + encodeURIComponent(email);
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${restKey}` },
-  });
-  if (!res.ok) {
-    console.error("UserList REST lookup failed:", res.status);
-    return null;
-  }
-  let data: { data?: unknown[] };
-  try { data = await res.json(); } catch { return null; }
-  const users: Array<{ identifier?: string; email_address?: string; last_seen_at?: string }> =
-    Array.isArray(data) ? data : (data?.data ?? []) as typeof users;
-  if (!users.length) return null;
-  const withId = users.filter((u) => u.identifier && String(u.identifier).trim() !== "");
-  const pool = withId.length > 0 ? withId : users;
-  pool.sort((a, b) => {
-    const ta = a.last_seen_at ? new Date(a.last_seen_at).getTime() : 0;
-    const tb = b.last_seen_at ? new Date(b.last_seen_at).getTime() : 0;
-    return tb - ta;
-  });
-  const best = pool[0];
-  return { identifier: best.identifier || email, email: best.email_address || email };
-}
-
+// ── UserList tracking ───────────────────────────────────────
 interface TrackPayload {
   name?: string;
   user: { email: string };
   properties?: Record<string, unknown>;
 }
 
-async function handleTrack(body: TrackPayload, origin: string | null, pushKey: string, restKey: string): Promise<Response> {
+async function handleTrack(body: TrackPayload, origin: string | null, pushKey: string): Promise<Response> {
   const email = body?.user?.email;
   if (!email) return err("user.email is required", 400, origin);
 
-  const found = await findUser(email, restKey);
-  const userPayload = found
-    ? { identifier: found.identifier, email: found.email }
-    : { email };
-
   const eventBody = {
     name: "DiagnosticCompleted",
-    user: userPayload,
+    user: { email },
     properties: {
       ...(body.properties || {}),
       url: "https://contraband.onetake.ai/ehv/vpl2-diagnostic/",
@@ -277,7 +243,6 @@ BunnySDK.net.http.serve(async (request: Request): Promise<Response> => {
     }
 
     const pushKey = process.env.USERLIST_PUSH_KEY;
-    const restKey = process.env.USERLIST_REST_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
     if (!anthropicKey) {
@@ -298,13 +263,12 @@ BunnySDK.net.http.serve(async (request: Request): Promise<Response> => {
       return handleDiagnose(body, origin, ip);
     }
 
-    if ((p === "/track" || p.endsWith("/track")) && pushKey && restKey) {
-      return handleTrack(body as TrackPayload, origin, pushKey, restKey);
-    }
-
     if (p === "/track" || p.endsWith("/track")) {
-      console.error("Missing USERLIST_PUSH_KEY or USERLIST_REST_KEY");
-      return err("Server configuration error", 500, origin);
+      if (!pushKey) {
+        console.error("Missing USERLIST_PUSH_KEY");
+        return err("Server configuration error", 500, origin);
+      }
+      return handleTrack(body as TrackPayload, origin, pushKey);
     }
 
     return err("Unknown endpoint: " + p, 404, origin);
