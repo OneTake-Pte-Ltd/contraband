@@ -634,10 +634,9 @@
       try { window.plausible('ViewContent', { props: props }); } catch (e) {}
     }
     // AnyTrack
-    try {
-      window._anytag = window._anytag || [];
-      window._anytag.push({ event: 'ViewContent', data: props });
-    } catch (e) {}
+    if (typeof window.AnyTrack === 'function') {
+      try { window.AnyTrack('trigger', 'ViewContent', { label: props.pillar_name }); } catch (e) {}
+    }
   }
 
   async function runDiagnosis() {
