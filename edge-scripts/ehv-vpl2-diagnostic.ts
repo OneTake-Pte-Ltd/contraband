@@ -5,17 +5,42 @@ import process from "node:process";
  * EHV VPL2 Diagnostic — Bunny Edge Script
  *
  * Endpoints:
- *   POST /diagnose  — proxy to Anthropic API, return AI diagnosis JSON
+ *   POST /diagnose  — proxy to OpenAI API, return AI diagnosis JSON
  *   POST /track     — fire DiagnosticCompleted event to UserList
  *
  * Environment variables:
- *   ANTHROPIC_API_KEY  — Anthropic API key
+ *   OPENAI_API_KEY     — OpenAI API key
  *   USERLIST_PUSH_KEY  — UserList Push API key  (Authorization: Push ...)
  */
 
 const ALLOWED_ORIGIN = "https://contraband.onetake.ai";
-const MODEL = "claude-sonnet-4-6";
+const MODEL = "gpt-5-mini";
 const MAX_TOKENS = 2048;
+
+const DIAGNOSIS_SCHEMA = {
+  name: "expert_business_diagnosis",
+  strict: true,
+  schema: {
+    type: "object",
+    properties: {
+      bottleneck_name:        { type: "string" },
+      bottleneck_intro:       { type: "string" },
+      why_this_pillar:        { type: "string" },
+      what_happens_without_it:{ type: "string" },
+      first_move:             { type: "string" },
+      encouragement:          { type: "string" },
+    },
+    required: [
+      "bottleneck_name",
+      "bottleneck_intro",
+      "why_this_pillar",
+      "what_happens_without_it",
+      "first_move",
+      "encouragement",
+    ],
+    additionalProperties: false,
+  },
+};
 
 // Simple in-memory rate limiter: 1 /diagnose request per IP per minute
 const rateLimitMap = new Map<string, number>();
@@ -125,59 +150,59 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
   const payload = body as { answers?: unknown };
   if (!payload?.answers) return err("answers is required", 400, origin);
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    console.error("Missing ANTHROPIC_API_KEY");
+    console.error("Missing OPENAI_API_KEY");
     return err("Server configuration error", 500, origin);
   }
 
-  const userMessage = JSON.stringify(payload.answers, null, 2);
-
-  let anthropicRes: Response;
+  let openaiRes: Response;
   try {
-    anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
+    openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: MAX_TOKENS,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userMessage }],
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: JSON.stringify(payload.answers, null, 2) },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: DIAGNOSIS_SCHEMA,
+        },
       }),
     });
   } catch (e) {
-    console.error("Anthropic fetch error:", e);
+    console.error("OpenAI fetch error:", e);
     return err("Upstream API unreachable", 502, origin);
   }
 
-  if (!anthropicRes.ok) {
-    const txt = await anthropicRes.text().catch(() => "");
-    console.error("Anthropic error:", anthropicRes.status, txt);
-    return err("Upstream API error: " + anthropicRes.status, 502, origin);
+  if (!openaiRes.ok) {
+    const txt = await openaiRes.text().catch(() => "");
+    console.error("OpenAI error:", openaiRes.status, txt);
+    return err("Upstream API error: " + openaiRes.status, 502, origin);
   }
 
-  let anthropicData: { content?: Array<{ type: string; text: string }> };
+  let openaiData: { choices?: Array<{ message: { content: string } }> };
   try {
-    anthropicData = await anthropicRes.json();
+    openaiData = await openaiRes.json();
   } catch (e) {
     return err("Failed to parse upstream response", 502, origin);
   }
 
-  const text = anthropicData?.content?.[0]?.text;
+  const text = openaiData?.choices?.[0]?.message?.content;
   if (!text) return err("Empty response from upstream", 502, origin);
-
-  // Strip possible markdown code fences
-  const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
 
   let diagnosis: unknown;
   try {
-    diagnosis = JSON.parse(cleaned);
+    diagnosis = JSON.parse(text);
   } catch (e) {
-    console.error("JSON parse error, raw:", cleaned.slice(0, 200));
+    console.error("JSON parse error, raw:", text.slice(0, 200));
     return err("Diagnosis response was not valid JSON", 502, origin);
   }
 
@@ -243,10 +268,8 @@ BunnySDK.net.http.serve(async (request: Request): Promise<Response> => {
     }
 
     const pushKey = process.env.USERLIST_PUSH_KEY;
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
-
-    if (!anthropicKey) {
-      console.error("Missing ANTHROPIC_API_KEY");
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("Missing OPENAI_API_KEY");
       return err("Server configuration error", 500, origin);
     }
 
