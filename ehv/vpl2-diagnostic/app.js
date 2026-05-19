@@ -48,7 +48,7 @@
     },
     {
       id: 'P1_2', kind: 'choice', section: 'Pillar 1 · Positioning', pillar: 1, label: '05',
-      prompt: 'Have you formalized the name of your proprietary method — and do you actively use it in your marketing?',
+      prompt: 'Have you registered a trademark for your proprietary method — and do you actively use it in your marketing?',
       sub: 'Your method itself, not your company name.',
       options: [
         { value: 3, label: 'Yes, I have a named method I use in my marketing' },
@@ -737,7 +737,7 @@
       ? '<input class="text-input" type="text" placeholder="' + esc(q.placeholder || '') + '" value="' + esc(textValue) + '" autocomplete="off" spellcheck="false"/>'
       : '';
 
-    return '<div class="app dark screen-enter">'
+    return '<div class="app screen-enter">'
       + '<div class="chrome">'
       + '<button class="back" data-action="back">' + chevronLeft() + ' Back</button>'
       + '<div class="step-counter"><strong>' + String(idx + 1).padStart(2, '0') + '</strong> / ' + String(total).padStart(2, '0') + '</div>'
@@ -764,7 +764,7 @@
     var emailVal = state.email || '';
     var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
 
-    return '<div class="app dark screen-enter">'
+    return '<div class="app screen-enter">'
       + '<div class="chrome">'
       + '<button class="back" data-action="back">' + chevronLeft() + ' Back</button>'
       + '<div class="step-counter"><strong>READY</strong></div>'
@@ -777,6 +777,7 @@
       + '<div class="email-field">'
       + '<label>Email address</label>'
       + '<input class="email-input" type="email" placeholder="you@yourdomain.com" value="' + esc(emailVal) + '" autocomplete="email"/>'
+      + '<div class="email-error" hidden></div>'
       + '</div>'
       + '<button class="btn full" data-action="submit-email"' + (valid ? '' : ' disabled') + '>Reveal my diagnostic ' + arrowRight() + '</button>'
       + '<div class="legal">By continuing you agree to receive the rest of the series by email. No spam — unsubscribe in one click.</div>'
@@ -805,7 +806,7 @@
       + '</g>'
       + '</svg>';
 
-    return '<div class="app dark screen-enter">'
+    return '<div class="app screen-enter">'
       + '<div class="chrome">'
       + '<span class="brand"><span class="dot"></span>DIAGNOSTIC IN PROGRESS</span>'
       + '<div class="step-counter"><strong>01</strong> / 05</div>'
@@ -896,9 +897,7 @@
   // ── Render dispatcher ──────────────────────────────────────
   function render() {
     var container = document.getElementById('app');
-    document.body.className = state.phase === 'landing' ? 'phase-landing'
-      : state.phase === 'results' ? 'phase-results'
-      : 'phase-dark';
+    document.body.className = state.phase;
 
     switch (state.phase) {
       case 'landing':  container.innerHTML = renderLanding(); break;
@@ -978,9 +977,19 @@
         var email = emailInp ? emailInp.value.trim() : state.email;
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
         state.email = email;
-        state.phase = 'loading';
-        save();
-        render();
+        var submitBtn = container.querySelector('[data-action="submit-email"]');
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Checking…'; }
+        bouncerValidate(email, function (valid) {
+          if (!valid) {
+            var errEl = container.querySelector('.email-error');
+            if (errEl) { errEl.textContent = 'Please enter a valid email address.'; errEl.hidden = false; }
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Reveal my diagnostic ' + arrowRight(); }
+            return;
+          }
+          state.phase = 'loading';
+          save();
+          render();
+        });
 
       } else if (action === 'share') {
         window.open(SHARE_URL, '_blank');
@@ -1148,6 +1157,15 @@
     state.copied = true;
     render();
     setTimeout(function () { state.copied = false; render(); }, 2500);
+  }
+
+  // ── useBouncer email validation ────────────────────────────
+  function bouncerValidate(email, cb) {
+    if (typeof window.useBouncer !== 'function') { cb(true); return; }
+    window.useBouncer(email, function (result) {
+      var blocked = result && (result.status === 'invalid' || result.status === 'disposable' || result.valid === false);
+      cb(!blocked);
+    });
   }
 
   // ── Service worker registration ────────────────────────────
