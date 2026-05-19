@@ -15,7 +15,7 @@ import process from "node:process";
 
 const ALLOWED_ORIGIN = "https://contraband.onetake.ai";
 const MODEL = "gpt-5-mini";
-const MAX_TOKENS = 2048;
+const MAX_TOKENS = 8192;
 
 const DIAGNOSIS_SCHEMA = {
   name: "expert_business_diagnosis",
@@ -232,6 +232,10 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
   const reqBody = {
     model: MODEL,
     max_output_tokens: MAX_TOKENS,
+    // gpt-5-mini is a reasoning model: reasoning tokens are deducted from
+    // max_output_tokens before the visible output. "low" effort keeps the
+    // reasoning budget small so the full JSON response fits in the window.
+    reasoning: { effort: "low" },
     input: [
       { role: "developer", content: SYSTEM_PROMPT },
       { role: "user", content: JSON.stringify(payload.answers, null, 2) },
@@ -282,6 +286,10 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
   }
 
   console.log("[diagnose] response status=%s output_items=%d", openaiData?.status, openaiData?.output?.length ?? 0);
+  // If status is not "completed", the response was truncated (likely by max_output_tokens)
+  if (openaiData?.status && openaiData.status !== "completed") {
+    console.error("[diagnose] response not completed — status=%s (likely token budget exhausted)", openaiData.status);
+  }
 
   // Find the first message output item with output_text content; fall back to top-level output_text
   const outputMsg = openaiData?.output?.find((o) => o.type === "message");
