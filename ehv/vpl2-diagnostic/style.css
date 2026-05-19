@@ -86,18 +86,22 @@ html, body {
     box-shadow: 0 0 0 1px var(--border);
     background: var(--bg);
   }
+  /* Center fixed action bar under the #app column:
+     left edge = 50vw - half column width */
   .action-bar {
-    left: 50%;
+    left: calc(50% - 320px);
     right: auto;
-    width: 100%;
-    max-width: 640px;
-    transform: translateX(-50%);
+    width: 640px;
+    transform: none;
   }
 }
 
 @media (min-width: 1024px) {
   #app { max-width: 720px; }
-  .action-bar { max-width: 720px; }
+  .action-bar {
+    left: calc(50% - 360px);
+    width: 720px;
+  }
 }
 
 /* ── App shell ───────────────────────────────────────────── */
@@ -545,7 +549,8 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 6px;
+  /* Extra bottom margin leaves room for Bouncer's validation widget */
+  margin-bottom: 60px;
 }
 
 .gate .email-field label {
@@ -898,6 +903,22 @@ html, body {
   box-shadow: none;
 }
 .next-step .btn.full:hover { opacity: 0.88; background: var(--fg); }
+
+.next-step .btn.full.accent-btn {
+  background: var(--accent);
+  color: #14110e;
+  box-shadow: 0 8px 24px rgba(227, 174, 40, 0.32);
+  font-size: 15px;
+  padding: 17px 26px;
+}
+.next-step .btn.full.accent-btn:hover { background: #f1bd35; opacity: 1; }
+
+.next-step-sub {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--fg-soft);
+  margin: 0 0 22px;
+}
 
 .copy-btn {
   background: transparent;

@@ -873,10 +873,11 @@
       + '<div class="pillar-viz">' + pentagonSvg + '<div class="pillar-meta">' + pillarChips + '</div></div>'
       + diagnosisHtml
       + '<div class="next-step">'
-      + '<div class="next-step-eyebrow">What\'s next</div>'
-      + '<h3>In the next video — the <em>Roadmap to a High-Value Expert Business</em> — Sébastien walks you through putting all 5 pillars in place, in order.</h3>'
+      + '<div class="next-step-eyebrow">Next step</div>'
+      + '<h3>Share your bottleneck in the <em>comments under the video</em>.</h3>'
+      + '<p class="next-step-sub">Tell Sébastien which pillar is holding you back — he reads every comment. The next video will show you the exact roadmap to fix it, in order.</p>'
       + '<div class="actions">'
-      + '<button class="btn full" data-action="share">Share my result ' + arrowRight() + '</button>'
+      + '<button class="btn full accent-btn" data-action="share">Post my result in the comments ' + arrowRight() + '</button>'
       + '<button class="copy-btn' + (state.copied ? ' copied' : '') + '" data-action="copy">'
       + (state.copied ? checkIcon() + ' Copied to clipboard' : copyIcon() + ' Copy my diagnostic')
       + '</button>'
