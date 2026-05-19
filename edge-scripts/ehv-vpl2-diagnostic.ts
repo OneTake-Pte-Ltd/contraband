@@ -6,7 +6,7 @@ import process from "node:process";
  *
  * Endpoints:
  *   POST /diagnose  — proxy to OpenAI API, return AI diagnosis JSON
- *   POST /track     — fire DiagnosticCompleted event to UserList
+ *   POST /track     — fire ViewContent event to UserList
  *
  * Environment variables:
  *   OPENAI_API_KEY     — OpenAI API key
