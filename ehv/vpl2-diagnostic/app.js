@@ -608,7 +608,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: 'DiagnosticCompleted',
+          name: 'ViewContent',
           user: { email: email },
           properties: {
             bottleneck_pillar: answersData.bottleneck_pillar,
@@ -622,6 +622,22 @@
     } catch (e) {
       // Track is non-blocking — never let it break the flow
     }
+  }
+
+  function fireViewContent(bottleneck) {
+    var props = {
+      pillar: String(bottleneck),
+      pillar_name: PILLAR_FULL_NAMES[bottleneck],
+    };
+    // Plausible
+    if (typeof window.plausible === 'function') {
+      try { window.plausible('ViewContent', { props: props }); } catch (e) {}
+    }
+    // AnyTrack
+    try {
+      window._anytag = window._anytag || [];
+      window._anytag.push({ event: 'ViewContent', data: props });
+    } catch (e) {}
   }
 
   async function runDiagnosis() {
@@ -650,6 +666,7 @@
       await new Promise(function (resolve) { setTimeout(resolve, minDuration - elapsed); });
     }
 
+    fireViewContent(state.bottleneck);
     stopLoadingAnimation();
     state.phase = 'results';
     save();

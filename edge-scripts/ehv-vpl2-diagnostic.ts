@@ -158,7 +158,7 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
 
   let openaiRes: Response;
   try {
-    openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+    openaiRes = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -166,14 +166,16 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: MAX_TOKENS,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: JSON.stringify(payload.answers, null, 2) },
-        ],
-        response_format: {
-          type: "json_schema",
-          json_schema: DIAGNOSIS_SCHEMA,
+        max_output_tokens: MAX_TOKENS,
+        instructions: SYSTEM_PROMPT,
+        input: JSON.stringify(payload.answers, null, 2),
+        text: {
+          format: {
+            type: "json_schema",
+            name: DIAGNOSIS_SCHEMA.name,
+            strict: DIAGNOSIS_SCHEMA.strict,
+            schema: DIAGNOSIS_SCHEMA.schema,
+          },
         },
       }),
     });
@@ -188,16 +190,18 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
     return err("Upstream API error: " + openaiRes.status, 502, origin);
   }
 
-  let openaiData: { choices?: Array<{ message: { content: string } }> };
+  let openaiData: { output?: Array<{ content?: Array<{ type: string; text: string }> }> };
   try {
     openaiData = await openaiRes.json();
   } catch (e) {
     return err("Failed to parse upstream response", 502, origin);
   }
 
-  const text = openaiData?.choices?.[0]?.message?.content;
+  const text = openaiData?.output?.[0]?.content?.[0]?.text;
   if (!text) return err("Empty response from upstream", 502, origin);
 
+  // With json_schema structured output the response is already valid JSON —
+  // parse it and forward directly.
   let diagnosis: unknown;
   try {
     diagnosis = JSON.parse(text);
@@ -221,7 +225,7 @@ async function handleTrack(body: TrackPayload, origin: string | null, pushKey: s
   if (!email) return err("user.email is required", 400, origin);
 
   const eventBody = {
-    name: "DiagnosticCompleted",
+    name: "ViewContent",
     user: { email },
     properties: {
       ...(body.properties || {}),
