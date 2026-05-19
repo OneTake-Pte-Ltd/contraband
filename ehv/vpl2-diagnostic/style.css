@@ -64,6 +64,8 @@ html, body {
   color: var(--fg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Room for Weglot language bar at the bottom */
+  padding-bottom: 56px;
 }
 
 #app {
@@ -85,8 +87,10 @@ html, body {
     background: var(--bg);
   }
   .action-bar {
-    max-width: 640px;
     left: 50%;
+    right: auto;
+    width: 100%;
+    max-width: 640px;
     transform: translateX(-50%);
   }
 }
