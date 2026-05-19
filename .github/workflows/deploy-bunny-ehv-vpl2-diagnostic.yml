@@ -1,0 +1,20 @@
+name: Deploy EHV VPL2 Diagnostic edge script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "edge-scripts/ehv-vpl2-diagnostic.ts"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Script to Bunny Edge Scripting
+        uses: BunnyWay/actions/deploy-script@main
+        with:
+          script_id: 75456
+          file: "edge-scripts/ehv-vpl2-diagnostic.ts"
