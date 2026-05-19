@@ -904,6 +904,22 @@ html, body {
 }
 .next-step .btn.full:hover { opacity: 0.88; background: var(--fg); }
 
+.next-step .btn.full.accent-btn {
+  background: var(--accent);
+  color: #14110e;
+  box-shadow: 0 8px 24px rgba(227, 174, 40, 0.32);
+  font-size: 15px;
+  padding: 17px 26px;
+}
+.next-step .btn.full.accent-btn:hover { background: #f1bd35; opacity: 1; }
+
+.next-step-sub {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--fg-soft);
+  margin: 0 0 22px;
+}
+
 .copy-btn {
   background: transparent;
   border: 1px solid var(--border-strong);
