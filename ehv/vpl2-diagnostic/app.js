@@ -48,7 +48,7 @@
     },
     {
       id: 'P1_2', kind: 'choice', section: 'Pillar 1 · Positioning', pillar: 1, label: '05',
-      prompt: 'Have you formalized the name of your proprietary method — and do you actively use it in your marketing?',
+      prompt: 'Have you registered a trademark for your proprietary method — and do you actively use it in your marketing?',
       sub: 'Your method itself, not your company name.',
       options: [
         { value: 3, label: 'Yes, I have a named method I use in my marketing' },
@@ -645,17 +645,9 @@
     var payload = buildPayload();
 
     try {
-      var results = await Promise.allSettled([
-        callDiagnose(payload),
-        callTrack(state.email, payload.answers),
-      ]);
-      var diagResult = results[0];
-      if (diagResult.status === 'fulfilled' && diagResult.value) {
-        state.diagnosis = diagResult.value;
-        state.diagnosisError = false;
-      } else {
-        state.diagnosisError = true;
-      }
+      var diag = await callDiagnose(payload);
+      state.diagnosis = diag;
+      state.diagnosisError = false;
     } catch (e) {
       state.diagnosisError = true;
     }
@@ -737,7 +729,7 @@
       ? '<input class="text-input" type="text" placeholder="' + esc(q.placeholder || '') + '" value="' + esc(textValue) + '" autocomplete="off" spellcheck="false"/>'
       : '';
 
-    return '<div class="app dark screen-enter">'
+    return '<div class="app screen-enter">'
       + '<div class="chrome">'
       + '<button class="back" data-action="back">' + chevronLeft() + ' Back</button>'
       + '<div class="step-counter"><strong>' + String(idx + 1).padStart(2, '0') + '</strong> / ' + String(total).padStart(2, '0') + '</div>'
@@ -764,7 +756,7 @@
     var emailVal = state.email || '';
     var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
 
-    return '<div class="app dark screen-enter">'
+    return '<div class="app screen-enter">'
       + '<div class="chrome">'
       + '<button class="back" data-action="back">' + chevronLeft() + ' Back</button>'
       + '<div class="step-counter"><strong>READY</strong></div>'
@@ -805,7 +797,7 @@
       + '</g>'
       + '</svg>';
 
-    return '<div class="app dark screen-enter">'
+    return '<div class="app screen-enter">'
       + '<div class="chrome">'
       + '<span class="brand"><span class="dot"></span>DIAGNOSTIC IN PROGRESS</span>'
       + '<div class="step-counter"><strong>01</strong> / 05</div>'
@@ -896,9 +888,7 @@
   // ── Render dispatcher ──────────────────────────────────────
   function render() {
     var container = document.getElementById('app');
-    document.body.className = state.phase === 'landing' ? 'phase-landing'
-      : state.phase === 'results' ? 'phase-results'
-      : 'phase-dark';
+    document.body.className = state.phase;
 
     switch (state.phase) {
       case 'landing':  container.innerHTML = renderLanding(); break;
@@ -978,6 +968,7 @@
         var email = emailInp ? emailInp.value.trim() : state.email;
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
         state.email = email;
+        callTrack(email, (buildPayload()).answers);
         state.phase = 'loading';
         save();
         render();
@@ -1095,34 +1086,80 @@
   }
 
   // ── Copy diagnostic ────────────────────────────────────────
+  var COPY_LABELS = {
+    FR: {
+      title: 'Mon Diagnostic de Business d\'Expert',
+      field: 'Domaine',
+      scores: 'Scores par pilier',
+      bottleneck: 'Goulot d\'étranglement',
+      why: 'Pourquoi ce pilier',
+      without: 'Ce qui se passe sans y remédier',
+      move: 'Premier mouvement',
+      footer: '— Diagnostic des Business d\'Expert · OneTake AI',
+    },
+    EN: {
+      title: 'My Expert Business Diagnostic',
+      field: 'Field',
+      scores: 'Pillar scores',
+      bottleneck: 'Bottleneck',
+      why: 'Why this pillar',
+      without: 'What happens without fixing it',
+      move: 'Your first move',
+      footer: '— Expert Business Diagnostic · OneTake AI',
+    },
+  };
+
+  function copyLabels() {
+    return COPY_LABELS[state.language] || COPY_LABELS.EN;
+  }
+
   function handleCopy() {
     var scores = state.scores || computeScores();
     var bottleneck = state.bottleneck || identifyBottleneck(scores);
     var diag = state.diagnosis;
     var expertise = state.answers.C1 || '—';
+    var L = copyLabels();
 
     var lines = [
-      'MY EXPERT BUSINESS DIAGNOSTIC',
+      '# ' + L.title,
       '',
-      'Field: ' + expertise,
+      '**' + L.field + ':** ' + expertise,
       '',
-      'Pillar scores:',
-      '  P1 Positioning:        ' + scores[1].pct + '/100',
-      '  P2 Irresistible Offer: ' + scores[2].pct + '/100',
-      '  P3 Audience:           ' + scores[3].pct + '/100',
-      '  P4 Sales Machine:      ' + scores[4].pct + '/100',
-      '  P5 Notoriety:          ' + scores[5].pct + '/100',
+      '## ' + L.scores,
+      '- P1 · ' + PILLAR_NAMES[1] + ': ' + scores[1].pct + '%',
+      '- P2 · ' + PILLAR_NAMES[2] + ': ' + scores[2].pct + '%',
+      '- P3 · ' + PILLAR_NAMES[3] + ': ' + scores[3].pct + '%',
+      '- P4 · ' + PILLAR_NAMES[4] + ': ' + scores[4].pct + '%',
+      '- P5 · ' + PILLAR_NAMES[5] + ': ' + scores[5].pct + '%',
       '',
-      '→ Bottleneck: Pillar ' + bottleneck + ' — ' + PILLAR_FULL_NAMES[bottleneck],
+      '**→ ' + L.bottleneck + ': Pillar ' + bottleneck + ' — ' + (diag ? diag.bottleneck_name : PILLAR_FULL_NAMES[bottleneck]) + '**',
     ];
 
-    if (diag && diag.bottleneck_intro) {
+    if (diag) {
       lines.push('');
-      lines.push(diag.bottleneck_intro.replace(/\{\{expertise\}\}/g, expertise));
+      lines.push('---');
+      lines.push('');
+      lines.push(diag.bottleneck_intro);
+      lines.push('');
+      lines.push('### ' + L.why);
+      lines.push('');
+      lines.push(diag.why_this_pillar);
+      lines.push('');
+      lines.push('### ' + L.without);
+      lines.push('');
+      lines.push(diag.what_happens_without_it);
+      lines.push('');
+      lines.push('### ' + L.move);
+      lines.push('');
+      lines.push(diag.first_move);
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+      lines.push('*' + diag.encouragement + '*');
     }
 
     lines.push('');
-    lines.push('— Diagnostic des Business d\'Expert · OneTake AI');
+    lines.push(L.footer);
 
     var text = lines.join('\n');
 

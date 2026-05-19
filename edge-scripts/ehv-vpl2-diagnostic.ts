@@ -156,6 +156,24 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
     return err("Server configuration error", 500, origin);
   }
 
+  const reqBody = {
+    model: MODEL,
+    max_output_tokens: MAX_TOKENS,
+    input: [
+      { role: "developer", content: SYSTEM_PROMPT },
+      { role: "user", content: JSON.stringify(payload.answers, null, 2) },
+    ],
+    text: {
+      format: {
+        type: "json_schema",
+        name: DIAGNOSIS_SCHEMA.name,
+        strict: DIAGNOSIS_SCHEMA.strict,
+        schema: DIAGNOSIS_SCHEMA.schema,
+      },
+    },
+  };
+  console.log("[diagnose] → OpenAI model=%s max_output_tokens=%d", MODEL, MAX_TOKENS);
+
   let openaiRes: Response;
   try {
     openaiRes = await fetch("https://api.openai.com/v1/responses", {
@@ -164,41 +182,44 @@ async function handleDiagnose(body: unknown, origin: string | null, ip: string):
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: MODEL,
-        max_output_tokens: MAX_TOKENS,
-        instructions: SYSTEM_PROMPT,
-        input: JSON.stringify(payload.answers, null, 2),
-        text: {
-          format: {
-            type: "json_schema",
-            name: DIAGNOSIS_SCHEMA.name,
-            strict: DIAGNOSIS_SCHEMA.strict,
-            schema: DIAGNOSIS_SCHEMA.schema,
-          },
-        },
-      }),
+      body: JSON.stringify(reqBody),
     });
   } catch (e) {
-    console.error("OpenAI fetch error:", e);
+    console.error("[diagnose] OpenAI fetch error:", e);
     return err("Upstream API unreachable", 502, origin);
   }
 
+  console.log("[diagnose] ← OpenAI status=%d", openaiRes.status);
+
   if (!openaiRes.ok) {
     const txt = await openaiRes.text().catch(() => "");
-    console.error("OpenAI error:", openaiRes.status, txt);
+    console.error("[diagnose] OpenAI error body:", txt.slice(0, 500));
     return err("Upstream API error: " + openaiRes.status, 502, origin);
   }
 
-  let openaiData: { output?: Array<{ content?: Array<{ type: string; text: string }> }> };
+  let openaiData: {
+    output?: Array<{ type?: string; content?: Array<{ type: string; text: string }> }>;
+    output_text?: string;
+    status?: string;
+  };
   try {
     openaiData = await openaiRes.json();
   } catch (e) {
     return err("Failed to parse upstream response", 502, origin);
   }
 
-  const text = openaiData?.output?.[0]?.content?.[0]?.text;
-  if (!text) return err("Empty response from upstream", 502, origin);
+  console.log("[diagnose] response status=%s output_items=%d", openaiData?.status, openaiData?.output?.length ?? 0);
+
+  // Find the first message output item with output_text content; fall back to top-level output_text
+  const outputMsg = openaiData?.output?.find((o) => o.type === "message");
+  const textContent = outputMsg?.content?.find((c) => c.type === "output_text");
+  const text = textContent?.text || openaiData?.output_text;
+
+  if (!text) {
+    console.error("[diagnose] no text found — response:", JSON.stringify(openaiData).slice(0, 800));
+    return err("Empty response from upstream", 502, origin);
+  }
+  console.log("[diagnose] text length=%d", text.length);
 
   // With json_schema structured output the response is already valid JSON —
   // parse it and forward directly.
@@ -223,6 +244,7 @@ interface TrackPayload {
 async function handleTrack(body: TrackPayload, origin: string | null, pushKey: string): Promise<Response> {
   const email = body?.user?.email;
   if (!email) return err("user.email is required", 400, origin);
+  console.log("[track] → UserList ViewContent email=%s", email.replace(/(.{2}).*(@)/, "$1…$2"));
 
   const eventBody = {
     name: "ViewContent",
@@ -242,9 +264,10 @@ async function handleTrack(body: TrackPayload, origin: string | null, pushKey: s
     body: JSON.stringify(eventBody),
   });
 
+  console.log("[track] ← UserList status=%d", res.status);
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    console.error("UserList push error:", res.status, txt);
+    console.error("[track] UserList error body:", txt.slice(0, 300));
     return err("UserList push error: " + res.status, res.status, origin);
   }
 
