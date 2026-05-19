@@ -215,6 +215,7 @@
     bottleneck: null,
     diagnosis: null,
     diagnosisError: false,
+    diagnosisRunning: false,
     email: '',
     copied: false,
   };
@@ -659,6 +660,7 @@
 
     fireViewContent(state.bottleneck);
     stopLoadingAnimation();
+    state.diagnosisRunning = false;
     state.phase = 'results';
     save();
     render();
@@ -900,7 +902,8 @@
 
     attachListeners();
 
-    if (state.phase === 'loading') {
+    if (state.phase === 'loading' && !state.diagnosisRunning) {
+      state.diagnosisRunning = true;
       startLoadingAnimation();
       runDiagnosis();
     }
@@ -925,7 +928,8 @@
     var container = document.getElementById('app');
 
     // Delegated click on data-action buttons
-    container.addEventListener('click', function (e) {
+    // Use direct assignment (not addEventListener) to avoid stacking listeners across renders
+    container.onclick = function (e) {
       var btn = e.target.closest('[data-action]');
       if (!btn) return;
       var action = btn.getAttribute('data-action');
@@ -987,6 +991,7 @@
         state.bottleneck = null;
         state.diagnosis = null;
         state.diagnosisError = false;
+        state.diagnosisRunning = false;
         state.email = '';
         state.copied = false;
         sessionStorage.removeItem('diag_v1');
@@ -998,7 +1003,7 @@
         save();
         render();
       }
-    });
+    };
 
     // Option pills
     container.querySelectorAll('.option').forEach(function (el) {
