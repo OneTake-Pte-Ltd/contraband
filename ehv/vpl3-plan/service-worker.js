@@ -2,7 +2,7 @@
    Service worker — offline cache for the static PWA
    ========================================================================== */
 
-const VERSION = 'roadmap-v2';
+const VERSION = 'roadmap-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -14,7 +14,7 @@ const CORE_ASSETS = [
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..600&family=Manrope:wght@400;500;600;700&display=swap'
+  'https://fonts.bunny.net/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..600&family=Manrope:wght@400;500;600;700&display=swap'
 ];
 
 self.addEventListener('install', (event) => {
@@ -43,7 +43,7 @@ self.addEventListener('activate', (event) => {
 /**
  * Strategy:
  *   - HTML/CSS/JS/data: stale-while-revalidate
- *   - Fonts (Google Fonts): cache-first
+ *   - Fonts (Bunny Fonts): cache-first
  *   - Other (images/icons): cache-first with network fallback
  */
 self.addEventListener('fetch', (event) => {
@@ -51,9 +51,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  const isFonts =
-    url.hostname === 'fonts.googleapis.com' ||
-    url.hostname === 'fonts.gstatic.com';
+  const isFonts = url.hostname === 'fonts.bunny.net';
 
   if (isFonts) {
     // Cache-first for fonts
