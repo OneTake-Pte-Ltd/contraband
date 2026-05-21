@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Roadmap to become a High-Value Expert &middot; One page</title>
+  <meta name="description" content="The roadmap to become a high-value expert, on one printable page." />
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <script type="text/javascript" src="https://try.onetake.ai/tools.js"></script>
+  <style>
+    /* Print-page specific layout */
+    body { background: white; }
+    .print-page {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 32px 40px 56px;
+    }
+    .print-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1.5px solid var(--ink-strong);
+      margin-bottom: 1.5rem;
+    }
+    .print-header h1 {
+      font-size: 2.4rem;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .print-header .meta {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      color: var(--ink-muted);
+      text-align: right;
+      line-height: 1.6;
+    }
+    .print-header .meta strong {
+      display: block;
+      color: var(--ink-strong);
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1rem;
+    }
+
+    .print-intro {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      line-height: 1.4;
+      color: var(--ink-muted);
+      max-width: 60ch;
+      margin-bottom: 1.75rem;
+    }
+
+    .print-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      border-top: 1px solid var(--ink-strong);
+      border-bottom: 1px solid var(--rule);
+    }
+    @media (max-width: 900px) { .print-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .col {
+      padding: 1rem 0.75rem 1.25rem;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .col:last-child { border-right: 0; }
+
+    .col-head {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.5rem;
+    }
+    .col-head .numeral {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.8rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .col-head .name {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--ink-strong);
+      line-height: 1.1;
+    }
+    .col .tagline {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 0.92rem;
+      line-height: 1.3;
+    }
+
+    .col .when {
+      font-family: var(--sans);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 0.5rem;
+    }
+    .col .life {
+      font-family: var(--serif);
+      font-size: 0.85rem;
+      line-height: 1.35;
+      color: var(--ink);
+      padding-left: 0.5rem;
+      border-left: 1px solid var(--accent);
+    }
+
+    .col .step-mini {
+      padding-top: 0.6rem;
+      border-top: 1px dashed var(--rule);
+    }
+    .col .step-mini .lbl {
+      font-family: var(--sans);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.2rem;
+    }
+    .col .step-mini .num {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--accent);
+      font-size: 1rem;
+      margin-right: 0.3rem;
+    }
+    .col .step-mini .ttl {
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      line-height: 1.25;
+      color: var(--ink-strong);
+      margin-bottom: 0.15rem;
+    }
+    .col .step-mini .desc {
+      font-size: 0.78rem;
+      line-height: 1.35;
+      color: var(--ink-muted);
+    }
+
+    .why {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.25rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    @media (max-width: 700px) { .why { grid-template-columns: 1fr; } }
+    .why .block .lbl {
+      font-family: var(--sans);
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .why .block h3 {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      margin-bottom: 0.4rem;
+      color: var(--ink-strong);
+    }
+    .why .block p {
+      font-family: var(--serif);
+      font-size: 0.88rem;
+      line-height: 1.4;
+      color: var(--ink-muted);
+      margin: 0;
+    }
+
+    .print-foot {
+      margin-top: 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: end;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+    }
+    .print-foot .invitation {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--ink-strong);
+      max-width: 60ch;
+    }
+    .print-foot .program {
+      text-align: right;
+      font-family: var(--sans);
+    }
+    .print-foot .program strong {
+      display: block;
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1rem;
+      color: var(--ink-strong);
+      margin-bottom: 0.15rem;
+    }
+
+    .print-actions {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 10;
+    }
+    .print-actions a, .print-actions button {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      padding: 0.5rem 0.9rem;
+      border: 1px solid var(--rule);
+      background: var(--bg);
+      color: var(--ink-strong);
+      cursor: pointer;
+      border-radius: 999px;
+      text-decoration: none;
+    }
+    .print-actions a:hover, .print-actions button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 10mm; }
+      .print-actions { display: none; }
+      .print-page { padding: 0; max-width: none; }
+      body { font-size: 9pt; }
+      .print-header h1 { font-size: 1.8rem; }
+      .print-intro { font-size: 0.9rem; margin-bottom: 0.75rem; }
+      .col { padding: 0.5rem 0.5rem 0.75rem; gap: 0.5rem; }
+      .col .life { font-size: 8pt; }
+      .col .step-mini .ttl { font-size: 9pt; }
+      .col .step-mini .desc { font-size: 7.5pt; }
+      .why .block p { font-size: 8pt; }
+      .print-grid, .why, .col, .step-mini { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-actions">
+    <a href="index.html">&larr; Back to roadmap</a>
+    <button id="print-btn" type="button">Print this page</button>
+  </div>
+
+  <main class="print-page" id="print-page">
+    <!-- rendered by inline script below -->
+  </main>
+
+  <script src="./assets/data.js"></script>
+  <script>
+    (function () {
+      const data = window.ROADMAP;
+      const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+      const stepById = (id) => data.steps.find(s => s.id === id);
+
+      const today = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+      const columns = data.pillars.map(p => {
+        const steps = p.stepIds.map(stepById).filter(Boolean);
+        const life = p.lifeWhenInPlace[0];
+        return `
+          <div class="col">
+            <div class="col-head">
+              <span class="numeral">${p.numeral}</span>
+              <div class="name">${esc(p.name)}</div>
+            </div>
+            <div class="tagline">${esc(p.tagline)}</div>
+
+            <div class="when">When it&rsquo;s in place</div>
+            <div class="life">${esc(life)}</div>
+
+            ${steps.map(s => `
+              <div class="step-mini">
+                <div class="lbl">Step ${s.id < 10 ? '0' + s.id : s.id}</div>
+                <div class="ttl"><span class="num">${s.id < 10 ? '0' + s.id : s.id}.</span>${esc(s.title)}</div>
+                <div class="desc">${esc(s.doThisWeek)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }).join('');
+
+      const whyBlocks = data.pillars.slice(0, 3).map(p => `
+        <div class="block">
+          <div class="lbl">Mentor &middot; Pillar ${p.numeral}</div>
+          <h3>${esc(p.name)}</h3>
+          <p>${esc(p.whyMentor.body)}</p>
+        </div>
+      `).join('');
+
+      document.getElementById('print-page').innerHTML = `
+        <header class="print-header">
+          <div>
+            <div class="eyebrow">The roadmap on one page</div>
+            <h1>The Roadmap to become a High-Value Expert.</h1>
+          </div>
+          <div class="meta">
+            <strong>${esc(data.meta.author)}</strong>
+            5 pillars &middot; 12 steps<br />
+            ${today}
+          </div>
+        </header>
+
+        <p class="print-intro">${esc(data.meta.intro)}</p>
+
+        <div class="print-grid">
+          ${columns}
+        </div>
+
+        <div class="why">
+          ${whyBlocks}
+        </div>
+
+        <div class="print-foot">
+          <div class="invitation">${esc(data.closing.invitation)}</div>
+          <div class="program">
+            <strong>${esc(data.closing.program)}</strong>
+            12 live sessions &middot; small group &middot; 6 months
+          </div>
+        </div>
+      `;
+
+      document.getElementById('print-btn').addEventListener('click', function () {
+        document.fonts.ready.then(function () { window.print(); });
+      });
+    })();
+  </script>
+</body>
+</html>
