@@ -368,7 +368,7 @@
     // Bridge + CTA
     html += '<div class="bridge-wrap" id="bridge-section">' +
       '<p class="bridge-sentence">' + esc(data.bridgeSentence) + '</p>' +
-      '<a href="#cta-link" class="cta-btn">Join Le Cercle des Experts →</a>' +
+      '<a href="https://try.onetake.ai/bootcamps/mav/vpl1-secret/#comments" class="cta-btn">Share your results here! →</a>' +
     '</div>';
 
     html += '</div>'; // results-shell
