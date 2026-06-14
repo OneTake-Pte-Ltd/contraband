@@ -25,9 +25,8 @@
   // ── Mock response (used when PROXY_URL is a placeholder) ───
   var MOCK_RESPONSE = {
     profile: {
-      level: 'freedman',
-      label: 'Freedman',
-      description: "You've built something real — you have expertise, you have an audience, and you're generating revenue. But right now, you are still the main engine of your business. When you step away, things slow down. You've escaped the early grind, but you haven't yet crossed into true freedom. The good news: you're closer than you think, and the assets you've already built are your fastest route there."
+      score: 42,
+      description: "Your business is partially autonomous, but you're still the main engine behind it. Sales slow down when you step away, which means you haven't yet built the systems that let your expertise work without you. The assets you already have are your fastest route to changing that."
     },
     dormantAssets: [
       {
@@ -400,10 +399,12 @@
   }
 
   function renderProfileContent(profile) {
-    var level = profile.level || 'freedman';
-    var label = profile.label || 'Freedman';
-    return '<span class="profile-badge ' + esc(level) + '">' + esc(label) + '</span>' +
-      '<p class="profile-description">' + esc(profile.description) + '</p>';
+    var score = typeof profile.score === 'number' ? profile.score : 0;
+    return '<div class="profile-score-wrap">' +
+      '<div class="profile-score-number">' + score + '<span class="profile-score-denom"> / 100</span></div>' +
+      '<div class="profile-score-label">Free Entrepreneur Score</div>' +
+    '</div>' +
+    '<p class="profile-description">' + esc(profile.description) + '</p>';
   }
 
   function renderAssetsContent(assets) {
