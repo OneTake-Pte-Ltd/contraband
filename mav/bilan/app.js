@@ -340,13 +340,13 @@
 
     // Header
     html += '<div class="results-header">' +
-      '<div class="results-eyebrow">Your Free Expert Assessment</div>' +
+      '<div class="results-eyebrow">Your &quot;Free Entrepreneur&quot; Assessment</div>' +
       '<h1 class="results-title">Here\'s what OneTake found.</h1>' +
       '<p class="results-sub">Based on your answers — personalized for you.</p>' +
     '</div>';
 
     // Section A — Profile
-    html += renderResultSection('A', 'Your Free Expert Profile',
+    html += renderResultSection('A', 'Your &quot;Free Entrepreneur&quot; Profile',
       renderProfileContent(data.profile)
     );
 
@@ -402,7 +402,7 @@
     var score = typeof profile.score === 'number' ? profile.score : 0;
     return '<div class="profile-score-wrap">' +
       '<div class="profile-score-number">' + score + '<span class="profile-score-denom"> / 100</span></div>' +
-      '<div class="profile-score-label">Free Entrepreneur Score</div>' +
+      '<div class="profile-score-label">&quot;Free Entrepreneur&quot; Score</div>' +
     '</div>' +
     '<p class="profile-description">' + esc(profile.description) + '</p>';
   }
