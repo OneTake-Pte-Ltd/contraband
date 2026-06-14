@@ -3,7 +3,7 @@
 
   // ── Config ─────────────────────────────────────────────────
   var WEBHOOK_URL = 'https://placeholder.n8n.webhook/bilan';
-  var PROXY_URL   = 'https://placeholder.bunny.proxy/api/bilan';
+  var PROXY_URL   = 'https://proxy-ehv-mav-vpl1-bilan-d2prs.bunny.run/api/bilan';
   var TOTAL_STEPS = 8; // steps 1–8 (not counting hero or results)
 
   // ── State ──────────────────────────────────────────────────
