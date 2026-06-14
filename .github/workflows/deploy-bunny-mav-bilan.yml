@@ -1,0 +1,23 @@
+name: Deploy MAV Bilan edge script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "edge-scripts/mav-bilan.ts"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Script to Bunny Edge Scripting
+        uses: BunnyWay/actions/deploy-script@main
+        with:
+          script_id: 78863
+          file: "edge-scripts/mav-bilan.ts"
