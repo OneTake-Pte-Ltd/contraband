@@ -185,7 +185,7 @@
 
   function renderEmailStep() {
     return '<h2 class="question-title">What\'s your email address?</h2>' +
-      '<p class="question-sub">Your results are generated in real time — we\'ll send them to this address so you can revisit them.</p>' +
+      '<p class="question-sub">Your results will be displayed instantly once you complete the assessment.</p>' +
       '<div class="field-wrap">' +
         '<input type="email" class="text-input" id="input-email" placeholder="you@example.com" value="' + esc(answers.email) + '" autocomplete="email" aria-label="Your email address" />' +
         '<div class="field-error" id="email-error" aria-live="polite"></div>' +
