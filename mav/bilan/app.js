@@ -268,9 +268,9 @@
 
   function renderWeekOffStep() {
     var opts = [
-      { value: 'keeps-going', label: 'Sales keep going' },
-      { value: 'slows-down', label: 'They slow down' },
-      { value: 'stops', label: 'They stop' },
+      { value: 'keeps-going', label: 'My sales keep going' },
+      { value: 'slows-down', label: 'My sales slow down' },
+      { value: 'stops', label: 'My sales just stop' },
       { value: 'dont-dare', label: "I don't dare take time off" }
     ];
     return '<h2 class="question-title">What happens when you take a week off?</h2>' +
@@ -346,7 +346,7 @@
     '</div>';
 
     // Section A — Profile
-    html += renderResultSection('A', 'Your &quot;Free Entrepreneur&quot; Profile',
+    html += renderResultSection('A', 'Your "Free Entrepreneur" Profile',
       renderProfileContent(data.profile)
     );
 
