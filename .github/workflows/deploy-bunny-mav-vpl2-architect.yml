@@ -1,0 +1,23 @@
+name: Deploy MAV VPL2 Architect edge script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "edge-scripts/mav-vpl2-architect.ts"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Script to Bunny Edge Scripting
+        uses: BunnyWay/actions/deploy-script@main
+        with:
+          script_id: 79366
+          file: "edge-scripts/mav-vpl2-architect.ts"
