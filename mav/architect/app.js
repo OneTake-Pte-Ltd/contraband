@@ -3,7 +3,7 @@
 
   // ── Config ──────────────────────────────────────────────────────────────────
   var WEBHOOK_URL = 'https://placeholder.n8n.webhook/architect';
-  var PROXY_URL   = 'https://placeholder.bunny.scripts/architect';
+  var PROXY_URL   = 'https://proxy-ehv-mav-vpl2-architect-4eoze.bunny.run/api/architect';
   var CTA_URL     = 'https://placeholder.vpl2.url/#comments';
   var TOTAL_STEPS = 9;
 
