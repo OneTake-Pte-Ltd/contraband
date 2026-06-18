@@ -4,7 +4,7 @@
   // ── Config ──────────────────────────────────────────────────────────────────
   var WEBHOOK_URL = 'https://placeholder.n8n.webhook/architect';
   var PROXY_URL   = 'https://proxy-ehv-mav-vpl2-architect-4eoze.bunny.run/api/architect';
-  var CTA_URL     = 'https://placeholder.vpl2.url/#comments';
+  var CTA_URL     = 'https://try.onetake.ai/bootcamps/mav/vpl2-megaphone/#comments';
   var TOTAL_STEPS = 9;
 
   /*
@@ -133,8 +133,8 @@
     },
     weakest_link: {
       step_id: 1,
-      analysis: "Your Toboggan currently starts too late. You rely on word-of-mouth referrals, which means you attract warm prospects — but in small, unpredictable numbers. Without a lead magnet at the top, there is no systematic way to bring cold strangers into your world. This single missing piece is what keeps your pipeline dependent on luck rather than design.",
-      suggested_lead_magnet: "Given your expertise, a high-value free guide would work extremely well — something like '5 signs your expertise is keeping you trapped' or a short self-assessment quiz. This type of content speaks directly to your ideal client's current frustration and can be promoted on LinkedIn and social media to attract new prospects 24/7, without you being present."
+      analysis: "Your Waterslide currently starts too late. You rely on word-of-mouth referrals, which means you attract warm prospects — but in small, unpredictable numbers. Without a lead magnet at the top, there is no systematic way to bring cold strangers into your world. This single missing piece is what keeps your pipeline dependent on luck rather than design.",
+      suggested_lead_magnet: "Given your expertise, a high-value free guide would work extremely well — something like '5 signs your expertise is keeping you trapped' or a short self-assessment quiz. This type of content speaks directly to your ideal client's current frustration and can be promoted on LinkedIn and social media to attract new prospects 24/7, without you being present, placing it at the top of your Waterslide."
     }
   };
 
@@ -217,11 +217,11 @@
   function renderHero() {
     return '<div class="hero-shell">' +
       '<div class="hero-inner">' +
-        '<div class="hero-eyebrow">OneTake AI · Visual Toboggan Architect</div>' +
+        '<div class="hero-eyebrow">OneTake AI · Visual Waterslide Architect</div>' +
         '<h1 class="hero-title">Visualize the exact sequence that turns a stranger into your client.</h1>' +
         '<div class="hero-deco"></div>' +
-        '<p class="hero-sub">Answer 9 questions about your business. OneTake maps your complete client journey — step by step — names every stage for your domain, flags the missing pieces, and identifies your single highest-impact gap.</p>' +
-        '<button class="btn-primary" id="hero-cta" style="font-size:15px;padding:18px 40px;">Build my Toboggan →</button>' +
+        '<p class="hero-sub">Answer 9 questions about your business. OneTake maps your complete Waterslide — your client journey from stranger to buyer — names every stage for your domain, flags the missing pieces, and identifies your single highest-impact gap.</p>' +
+        '<button class="btn-primary" id="hero-cta" style="font-size:15px;padding:18px 40px;">Build my Waterslide →</button>' +
       '</div>' +
     '</div>';
   }
@@ -258,7 +258,7 @@
 
   function renderEmailStep() {
     return '<h2 class="question-title">What\'s your email address?</h2>' +
-      '<p class="question-sub">Your Toboggan will be generated in real time — we\'ll send the results to this address so you can revisit them.</p>' +
+      '<p class="question-sub">Your Waterslide will appear on screen instantly. Leave your email so we can follow up with personalized advice.</p>' +
       '<div class="field-wrap">' +
         '<input type="email" class="text-input" id="input-email" placeholder="you@example.com" value="' + esc(answers.email) + '" autocomplete="email" aria-label="Your email address" />' +
         '<div class="field-error" id="email-error" aria-live="polite"></div>' +
@@ -267,18 +267,20 @@
 
   function renderExpertiseStep() {
     return '<h2 class="question-title">What is your area of expertise?</h2>' +
-      '<p class="question-sub">Be as specific as possible — this shapes every label in your Toboggan.</p>' +
+      '<p class="question-sub">Be as specific as possible — this shapes every label in your Waterslide.</p>' +
       '<div class="field-wrap">' +
-        '<input type="text" class="text-input" id="input-expertise" placeholder="e.g. Executive coaching, Canine behaviour, B2B leadership consulting" value="' + esc(answers.expertise) + '" autocomplete="off" aria-label="Area of expertise" />' +
+        '<textarea class="textarea-input" id="input-expertise" placeholder="e.g. Executive coaching, Canine behaviour, B2B leadership consulting" rows="3" autocomplete="off" aria-label="Area of expertise">' + esc(answers.expertise) + '</textarea>' +
+        '<div class="field-hint">Enter to submit · Shift+Enter or Ctrl+Enter for a new line</div>' +
         '<div class="field-error" id="expertise-error" aria-live="polite"></div>' +
       '</div>';
   }
 
   function renderIdealClientStep() {
-    return '<h2 class="question-title">Who is your ideal client, in one sentence?</h2>' +
+    return '<h2 class="question-title">Who is your ideal client?</h2>' +
       '<p class="question-sub">Think of the specific person who gets the most out of what you offer.</p>' +
       '<div class="field-wrap">' +
-        '<input type="text" class="text-input" id="input-ideal-client" placeholder="e.g. Experienced managers transitioning to entrepreneurship" value="' + esc(answers.idealClient) + '" autocomplete="off" aria-label="Your ideal client" />' +
+        '<textarea class="textarea-input" id="input-ideal-client" placeholder="e.g. Experienced managers transitioning to entrepreneurship" rows="3" autocomplete="off" aria-label="Your ideal client">' + esc(answers.idealClient) + '</textarea>' +
+        '<div class="field-hint">Enter to submit · Shift+Enter or Ctrl+Enter for a new line</div>' +
         '<div class="field-error" id="idealClient-error" aria-live="polite"></div>' +
       '</div>';
   }
@@ -287,7 +289,8 @@
     return '<h2 class="question-title">What main problem do you solve for them?</h2>' +
       '<p class="question-sub">The core transformation you deliver — before and after.</p>' +
       '<div class="field-wrap">' +
-        '<input type="text" class="text-input" id="input-core-problem" placeholder="e.g. They have expertise but can\'t sell it without being in the room" value="' + esc(answers.coreProblem) + '" autocomplete="off" aria-label="Main problem you solve" />' +
+        '<textarea class="textarea-input" id="input-core-problem" placeholder="e.g. They have expertise but can\'t sell it without being in the room" rows="3" autocomplete="off" aria-label="Main problem you solve">' + esc(answers.coreProblem) + '</textarea>' +
+        '<div class="field-hint">Enter to submit · Shift+Enter or Ctrl+Enter for a new line</div>' +
         '<div class="field-error" id="coreProblem-error" aria-live="polite"></div>' +
       '</div>';
   }
@@ -296,7 +299,8 @@
     return '<h2 class="question-title">What is your main offer and its approximate price?</h2>' +
       '<p class="question-sub">Your flagship product or service — the thing you sell most.</p>' +
       '<div class="field-wrap">' +
-        '<input type="text" class="text-input" id="input-main-offer" placeholder="e.g. 6-month group coaching program, €3,000" value="' + esc(answers.mainOffer) + '" autocomplete="off" aria-label="Main offer and price" />' +
+        '<textarea class="textarea-input" id="input-main-offer" placeholder="e.g. 6-month group coaching program, €3,000" rows="3" autocomplete="off" aria-label="Main offer and price">' + esc(answers.mainOffer) + '</textarea>' +
+        '<div class="field-hint">Enter to submit · Shift+Enter or Ctrl+Enter for a new line</div>' +
         '<div class="field-error" id="mainOffer-error" aria-live="polite"></div>' +
       '</div>';
   }
@@ -306,6 +310,7 @@
       '<p class="question-sub">Your key selling points — the things that make skeptical prospects say yes.</p>' +
       '<div class="field-wrap">' +
         '<textarea class="textarea-input" id="input-selling-points" placeholder="e.g. My method is proven with 200+ clients, results visible in 90 days, personal follow-up included…" aria-label="Key selling points" rows="5">' + esc(answers.sellingPoints) + '</textarea>' +
+        '<div class="field-hint">Enter to submit · Shift+Enter or Ctrl+Enter for a new line</div>' +
         '<div class="field-error" id="sellingPoints-error" aria-live="polite"></div>' +
       '</div>';
   }
@@ -315,6 +320,7 @@
       '<p class="question-sub">The hesitations that slow down or kill the sale.</p>' +
       '<div class="field-wrap">' +
         '<textarea class="textarea-input" id="input-objections" placeholder="e.g. It\'s too expensive, I don\'t have the time, my situation is different, I can figure it out alone…" aria-label="Typical objections" rows="5">' + esc(answers.objections) + '</textarea>' +
+        '<div class="field-hint">Enter to submit · Shift+Enter or Ctrl+Enter for a new line</div>' +
         '<div class="field-error" id="objections-error" aria-live="polite"></div>' +
       '</div>';
   }
@@ -329,7 +335,7 @@
       { value: 'none',     label: 'None yet' }
     ];
     return '<h2 class="question-title">What content do you already produce?</h2>' +
-      '<p class="question-sub">Select all that apply — these become steps in your Toboggan.</p>' +
+      '<p class="question-sub">Select all that apply — these become steps in your Waterslide.</p>' +
       renderChipGrid('existingContent', opts, answers.existingContent) +
       '<div class="field-error" id="existingContent-error" aria-live="polite"></div>';
   }
@@ -344,8 +350,8 @@
       renderCardList('hasLeadMagnet', opts, answers.hasLeadMagnet) +
       '<div id="lead-magnet-desc-wrap" style="margin-top:20px;display:' + (answers.hasLeadMagnet === 'yes' ? 'block' : 'none') + ';">' +
         '<div class="field-wrap">' +
-          '<input type="text" class="text-input" id="input-lead-magnet-desc" placeholder="e.g. A free quiz: What type of leader are you?" value="' + esc(answers.leadMagnetDesc) + '" autocomplete="off" aria-label="Describe your lead magnet" />' +
-          '<div class="field-hint">Briefly describe it — what it is and who it\'s for.</div>' +
+          '<textarea class="textarea-input" id="input-lead-magnet-desc" placeholder="e.g. A free quiz: What type of leader are you?" rows="3" autocomplete="off" aria-label="Describe your lead magnet">' + esc(answers.leadMagnetDesc) + '</textarea>' +
+          '<div class="field-hint">Briefly describe it — what it is and who it\'s for. Enter to submit · Shift+Enter for a new line.</div>' +
           '<div class="field-error" id="leadMagnetDesc-error" aria-live="polite"></div>' +
         '</div>' +
       '</div>';
@@ -391,7 +397,7 @@
           '<div class="loading-dot"></div>' +
           '<div class="loading-dot"></div>' +
         '</div>' +
-        '<h2 class="loading-title">Generating your Toboggan…</h2>' +
+        '<h2 class="loading-title">Generating your Waterslide…</h2>' +
         '<div class="loading-bar-wrap" role="progressbar" aria-label="Loading"><div class="loading-bar-fill"></div></div>' +
         '<p class="loading-message" id="loading-msg">Mapping out your sales journey…</p>' +
       '</div>' +
@@ -403,7 +409,7 @@
     return '<div class="error-shell">' +
       '<div class="error-inner">' +
         '<h2 class="error-title">Something went wrong</h2>' +
-        '<p class="error-body">We couldn\'t generate your Toboggan. This is usually temporary — please try again.</p>' +
+        '<p class="error-body">We couldn\'t generate your Waterslide. This is usually temporary — please try again.</p>' +
         '<button class="btn-primary" id="btn-retry">Try again</button>' +
       '</div>' +
     '</div>';
@@ -419,15 +425,15 @@
 
     // Header
     html += '<div class="results-header">' +
-      '<div class="results-eyebrow">Visual Toboggan Architect · OneTake AI</div>' +
-      '<h1 class="results-title">Your personalized Toboggan.</h1>' +
+      '<div class="results-eyebrow">Visual Waterslide Architect · OneTake AI</div>' +
+      '<h1 class="results-title">Your personalized Waterslide.</h1>' +
       '<p class="results-sub">Every step named for your business — in place or still to create.</p>' +
     '</div>';
 
     // Flowchart
     html += '<div class="toboggan-section">';
     html += '<div class="toboggan-label">Your complete client journey ↓</div>';
-    html += '<div class="toboggan" id="toboggan-flow" role="list" aria-label="Your Toboggan steps">';
+    html += '<div class="toboggan" id="toboggan-flow" role="list" aria-label="Your Waterslide steps">';
 
     steps.forEach(function (step, i) {
       var isInPlace   = step.status === 'in_place';
@@ -460,15 +466,16 @@
         html += '</ul></div>';
       }
 
+      // Connection label lives inside the card so it inherits the card background
+      if (i < steps.length - 1 && step.connection_label) {
+        html += '<div class="tob-node-connection" style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.2);font-size:12px;font-weight:600;opacity:0.85;letter-spacing:0.02em;">↳ ' + esc(step.connection_label) + '</div>';
+      }
+
       html += '</div>'; // .tob-node
 
-      // Connector (not after the last node)
+      // Connector arrow only — label moved inside the node above
       if (i < steps.length - 1) {
-        var connLabel = step.connection_label || '';
         html += '<div class="tob-connector" id="tob-conn-' + i + '" style="opacity:0;" aria-hidden="true">';
-        if (connLabel) {
-          html += '<div class="tob-connector-label">' + esc(connLabel) + '</div>';
-        }
         html += '<div class="tob-connector-arrow">↓</div>';
         html += '</div>';
       }
@@ -481,7 +488,7 @@
     html += '<div class="weakest-link" id="weakest-link-section">';
     html +=   '<div class="weakest-link-header">';
     html +=     '<div class="weakest-link-eyebrow">Priority action</div>';
-    html +=     '<div class="weakest-link-title">Your priority: the weakest link in your Toboggan</div>';
+    html +=     '<div class="weakest-link-title">Your priority: the weakest link in your Waterslide</div>';
     html +=   '</div>';
     html +=   '<div class="weakest-link-body">';
     if (wl.analysis) {
@@ -498,7 +505,7 @@
 
     // CTA
     html += '<div class="results-cta-wrap" id="results-cta">';
-    html +=   '<p class="results-cta-sentence">This Toboggan was built using the techniques taught in Le Cercle des Experts à Haute Valeur. Share your results and tell us what you discovered.</p>';
+    html +=   '<p class="results-cta-sentence">This Waterslide was built using the techniques taught in Le Cercle des Experts à Haute Valeur. Share your results and tell us what you discovered.</p>';
     html +=   '<a href="' + CTA_URL + '" class="cta-btn">Share my results →</a>';
     html += '</div>';
 
@@ -643,9 +650,8 @@
     bindTextInput('input-main-offer', 'mainOffer', step, true);
     bindTextInput('input-lead-magnet-desc', 'leadMagnetDesc', step, true);
 
-    // Textareas — no Enter-to-advance
-    bindTextInput('input-selling-points', 'sellingPoints', step, false);
-    bindTextInput('input-objections', 'objections', step, false);
+    bindTextInput('input-selling-points', 'sellingPoints', step, true);
+    bindTextInput('input-objections', 'objections', step, true);
   }
 
   function bindTextInput(id, key, step, enterAdvances) {
@@ -653,7 +659,12 @@
     if (!el) return;
     el.addEventListener('input', function () { answers[key] = this.value.trim(); });
     if (enterAdvances) {
-      el.addEventListener('keydown', function (e) { if (e.key === 'Enter') goNext(step); });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) {
+          e.preventDefault();
+          goNext(step);
+        }
+      });
     }
     // Auto-focus only the primary (non-conditional) inputs
     if (!el.closest('#lead-magnet-desc-wrap')) {
@@ -762,7 +773,7 @@
     'Placing your selling points at the right steps…',
     'Weaving in responses to your objections…',
     'Identifying the missing pieces…',
-    'Drawing your Toboggan…'
+    'Drawing your Waterslide…'
   ];
 
   function startLoading() {
@@ -830,7 +841,7 @@
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        tool:            'architecte-visuel-toboggan',
+        tool:            'architecte-visuel-waterslide',
         timestamp:       new Date().toISOString(),
         language:        answers.language,
         email:           answers.email,
