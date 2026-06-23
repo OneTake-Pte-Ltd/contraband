@@ -1,0 +1,23 @@
+name: Deploy MAV VPL3 Plan edge script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "edge-scripts/mav-vpl3-plan.ts"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy Script to Bunny Edge Scripting
+        uses: BunnyWay/actions/deploy-script@main
+        with:
+          script_id: 79789
+          file: "edge-scripts/mav-vpl3-plan.ts"

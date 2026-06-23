@@ -2,7 +2,7 @@
   'use strict';
 
   // ── Config ──────────────────────────────────────────────────────────────────
-  var WEBHOOK_URL = 'https://placeholder.n8n.webhook/plan-vpl3';
+  var WEBHOOK_URL = 'https://onetake.app.n8n.cloud/webhook/plan-vpl3';
   var PROXY_URL   = 'https://claude-proxy-ehv-mav-vpl3-vxd69.bunny.run/api/plan';
   var CTA_URL     = 'https://try.onetake.ai/bootcamps/mav/vpl3-clone/#comments';
   var TOTAL_STEPS = 6;
