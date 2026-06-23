@@ -3,7 +3,7 @@
 
   // ── Config ──────────────────────────────────────────────────────────────────
   var WEBHOOK_URL = 'https://placeholder.n8n.webhook/plan-vpl3';
-  var PROXY_URL   = 'https://placeholder.bunny.run/api/plan';
+  var PROXY_URL   = 'https://claude-proxy-ehv-mav-vpl3-vxd69.bunny.run/api/plan';
   var CTA_URL     = 'https://try.onetake.ai/bootcamps/mav/vpl3-clone/#comments';
   var TOTAL_STEPS = 6;
 

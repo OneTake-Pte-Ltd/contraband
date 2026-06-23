@@ -3,6 +3,8 @@ import process from "node:process";
 
 /**
  * MAV VPL3 Plan — Bunny Edge Script
+ * Script ID: 79789
+ * URL: https://claude-proxy-ehv-mav-vpl3-vxd69.bunny.run/
  *
  * Endpoints:
  *   POST /api/plan  — proxy to OpenAI, return 5-pillar action plan JSON
