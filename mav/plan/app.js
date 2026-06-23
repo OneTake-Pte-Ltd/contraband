@@ -5,7 +5,7 @@
   var WEBHOOK_URL = 'https://onetake.app.n8n.cloud/webhook/plan-vpl3';
   var PROXY_URL   = 'https://claude-proxy-ehv-mav-vpl3-vxd69.bunny.run/api/plan';
   var CTA_URL     = 'https://try.onetake.ai/bootcamps/mav/vpl3-clone/#comments';
-  var TOTAL_STEPS = 6;
+  var TOTAL_STEPS = 9;
 
   /*
    * Proxy system prompt guidance (implemented server-side):
@@ -59,16 +59,16 @@
 
   // ── State ───────────────────────────────────────────────────────────────────
   var currentStep  = 0;
-  var lastPayload  = null; // stored for retry
+  var lastPayload  = null;
 
   var answers = {
-    email:         '',
-    expertise:     '',
-    positioning:   0,
-    offer:         0,
-    video_content: 0,
-    sales_system:  0,
-    partnerships:  0,
+    email:          '',
+    expertise:      '',
+    positioning:    0,
+    offer:          0,
+    video_content:  0,
+    sales_system:   0,
+    partnerships:   0,
     hours_per_week: '',
     team:           '',
     obstacle:       ''
@@ -121,6 +121,50 @@
     { key: 'partnerships',  label: 'Partnerships' }
   ];
 
+  // Steps 3–7 map to pillar index 0–4
+  var PILLAR_QUESTIONS = [
+    {
+      title:    'Your positioning and signature method',
+      opts: [
+        { value: '1', label: 'When someone asks me what I do, I explain for 3 minutes and they still don\'t really get it.' },
+        { value: '2', label: 'I can explain what I do, but I don\'t clearly stand out from others in my field.' },
+        { value: '3', label: 'People understand in one sentence what I do and why it\'s different from anything else out there.' }
+      ]
+    },
+    {
+      title:    'Your structured, priced offer',
+      opts: [
+        { value: '1', label: 'I do custom work every time — pricing case by case, no clear structure, and I often struggle to justify my rates.' },
+        { value: '2', label: 'I have a defined offer with a price, but prospects often hesitate or compare me with cheaper alternatives.' },
+        { value: '3', label: 'My offer is clear, my rates are firm, and clients understand why it\'s worth the price.' }
+      ]
+    },
+    {
+      title:    'Your video content',
+      opts: [
+        { value: '1', label: 'I don\'t publish video, or only very rarely — when I have time, which is basically never.' },
+        { value: '2', label: 'I publish from time to time, but it\'s inconsistent and I\'m not sure it actually brings in clients.' },
+        { value: '3', label: 'I have a regular publishing rhythm and I can see that my content attracts qualified prospects.' }
+      ]
+    },
+    {
+      title:    'Your automated sales system',
+      opts: [
+        { value: '1', label: 'My sales depend entirely on me: if I\'m not prospecting, following up, or posting, nothing comes in.' },
+        { value: '2', label: 'I have bits and pieces of a system (a sales page, some emails), but nothing that runs end-to-end on its own.' },
+        { value: '3', label: 'I have a funnel in place: people discover me, receive my content, and some buy without me lifting a finger.' }
+      ]
+    },
+    {
+      title:    'Your partnerships and paid visibility',
+      opts: [
+        { value: '1', label: 'I rely solely on my own content and word of mouth to get known.' },
+        { value: '2', label: 'I\'ve done a few collaborations or tested some ads, but nothing regular or structured.' },
+        { value: '3', label: 'I have active partnerships or ad campaigns that bring in new prospects on a regular basis.' }
+      ]
+    }
+  ];
+
   // ── Init ────────────────────────────────────────────────────────────────────
   function init() {
     render(0);
@@ -136,7 +180,7 @@
 
     if (step === 0) {
       app.innerHTML = renderHero();
-    } else if (step === 7) {
+    } else if (step === 10) {
       app.innerHTML = renderLoading();
       startLoading();
     } else if (step === 'error') {
@@ -175,17 +219,19 @@
 
   // ── Steps shell ─────────────────────────────────────────────────────────────
   function renderStep(step) {
-    var isPillarScreen = (step === 3 || step === 4);
-    var html = '<div class="step-shell"><div class="step-inner' + (isPillarScreen ? ' wide' : '') + '">';
+    var html = '<div class="step-shell"><div class="step-inner">';
     html += '<div class="step-label">Step ' + step + ' / ' + TOTAL_STEPS + '</div>';
 
     switch (step) {
-      case 1: html += renderEmailStep();        break;
-      case 2: html += renderExpertiseStep();    break;
-      case 3: html += renderPillars135Step();   break;
-      case 4: html += renderPillars46Step();    break;
-      case 5: html += renderCapacityStep();     break;
-      case 6: html += renderObstacleStep();     break;
+      case 1: html += renderEmailStep();             break;
+      case 2: html += renderExpertiseStep();         break;
+      case 3: html += renderSinglePillarStep(0);     break;
+      case 4: html += renderSinglePillarStep(1);     break;
+      case 5: html += renderSinglePillarStep(2);     break;
+      case 6: html += renderSinglePillarStep(3);     break;
+      case 7: html += renderSinglePillarStep(4);     break;
+      case 8: html += renderCapacityStep();          break;
+      case 9: html += renderObstacleStep();          break;
     }
 
     html += '<div class="step-nav">';
@@ -205,7 +251,7 @@
   // ── Step 1 — Email ──────────────────────────────────────────────────────────
   function renderEmailStep() {
     return '<h2 class="question-title">Your email address</h2>' +
-      '<p class="question-sub">Your action plan will appear on screen right away. Leave your email so we can send it to you as well.</p>' +
+      '<p class="question-sub">Your action plan will appear on screen straight away.</p>' +
       '<div class="field-wrap">' +
         '<input type="email" class="text-input" id="input-email" placeholder="you@example.com" value="' + esc(answers.email) + '" autocomplete="email" aria-label="Your email address" />' +
         '<div class="field-error" id="email-error" aria-live="polite"></div>' +
@@ -222,71 +268,31 @@
       '</div>';
   }
 
-  // ── Step 3 — Pillars 1–3 ────────────────────────────────────────────────────
-  function renderPillars135Step() {
-    var pillarOpts = {
-      positioning: [
-        { value: '1', label: 'When someone asks me what I do, I explain for 3 minutes and they still don\'t really get it.' },
-        { value: '2', label: 'I can explain what I do, but I don\'t clearly stand out from others in my field.' },
-        { value: '3', label: 'People understand in one sentence what I do and why it\'s different from anything else out there.' }
-      ],
-      offer: [
-        { value: '1', label: 'I do custom work every time — pricing case by case, no clear structure, and I often struggle to justify my rates.' },
-        { value: '2', label: 'I have a defined offer with a price, but prospects often hesitate or compare me with cheaper alternatives.' },
-        { value: '3', label: 'My offer is clear, my rates are firm, and clients understand why it\'s worth the price.' }
-      ],
-      video_content: [
-        { value: '1', label: 'I don\'t publish video, or only very rarely — when I have time, which is basically never.' },
-        { value: '2', label: 'I publish from time to time, but it\'s inconsistent and I\'m not sure it actually brings in clients.' },
-        { value: '3', label: 'I have a regular publishing rhythm and I can see that my content attracts qualified prospects.' }
-      ]
-    };
+  // ── Steps 3–7 — One pillar per page ─────────────────────────────────────────
+  function renderSinglePillarStep(pillarIdx) {
+    var pillar = PILLARS[pillarIdx];
+    var q      = PILLAR_QUESTIONS[pillarIdx];
+    var eyebrow = 'Pillar ' + (pillarIdx + 1) + ' of 5';
 
-    return '<h2 class="question-title">Where do you stand on each of the 5 Pillars?</h2>' +
+    return '<div class="pillar-eyebrow">' + esc(eyebrow) + '</div>' +
+      '<h2 class="question-title">' + esc(q.title) + '</h2>' +
       '<p class="question-sub">Pick the description that sounds most like you right now — not where you want to be.</p>' +
-      renderPillarGroup('positioning',   'Your positioning and signature method', pillarOpts.positioning,   answers.positioning) +
-      '<div class="pillar-divider"></div>' +
-      renderPillarGroup('offer',         'Your structured, priced offer',          pillarOpts.offer,         answers.offer) +
-      '<div class="pillar-divider"></div>' +
-      renderPillarGroup('video_content', 'Your video content',                     pillarOpts.video_content, answers.video_content) +
-      '<div class="field-error" id="pillars135-error" aria-live="polite"></div>';
+      renderPillarGroup(pillar.key, q.opts, answers[pillar.key]) +
+      '<div class="field-error" id="pillar-error" aria-live="polite"></div>';
   }
 
-  // ── Step 4 — Pillars 4–5 ────────────────────────────────────────────────────
-  function renderPillars46Step() {
-    var pillarOpts = {
-      sales_system: [
-        { value: '1', label: 'My sales depend entirely on me: if I\'m not prospecting, following up, or posting, nothing comes in.' },
-        { value: '2', label: 'I have bits and pieces of a system (a sales page, some emails), but nothing that runs end-to-end on its own.' },
-        { value: '3', label: 'I have a funnel in place: people discover me, receive my content, and some buy without me lifting a finger.' }
-      ],
-      partnerships: [
-        { value: '1', label: 'I rely solely on my own content and word of mouth to get known.' },
-        { value: '2', label: 'I\'ve done a few collaborations or tested some ads, but nothing regular or structured.' },
-        { value: '3', label: 'I have active partnerships or ad campaigns that bring in new prospects on a regular basis.' }
-      ]
-    };
-
-    return '<h2 class="question-title">Two more pillars.</h2>' +
-      '<p class="question-sub">Pick the description that sounds most like you right now.</p>' +
-      renderPillarGroup('sales_system', 'Your automated sales system (Toboggan)', pillarOpts.sales_system, answers.sales_system) +
-      '<div class="pillar-divider"></div>' +
-      renderPillarGroup('partnerships', 'Your partnerships and paid visibility',   pillarOpts.partnerships,  answers.partnerships) +
-      '<div class="field-error" id="pillars46-error" aria-live="polite"></div>';
-  }
-
-  // ── Step 5 — Capacity ────────────────────────────────────────────────────────
+  // ── Step 8 — Capacity ────────────────────────────────────────────────────────
   function renderCapacityStep() {
     var hourOpts = [
-      { value: '2-5h',  label: '2–5h per week' },
-      { value: '5-10h', label: '5–10h per week' },
-      { value: '10-20h',label: '10–20h per week' },
-      { value: '20h+',  label: '20h+ per week' }
+      { value: '2-5h',   label: '2–5h per week' },
+      { value: '5-10h',  label: '5–10h per week' },
+      { value: '10-20h', label: '10–20h per week' },
+      { value: '20h+',   label: '20h+ per week' }
     ];
     var teamOpts = [
-      { value: 'Solo',        label: 'Solo' },
-      { value: '1-2 people',  label: '1–2 people' },
-      { value: 'Team of 3+',  label: 'Team of 3+' }
+      { value: 'Solo',       label: 'Solo' },
+      { value: '1-2 people', label: '1–2 people' },
+      { value: 'Team of 3+', label: 'Team of 3+' }
     ];
 
     return '<h2 class="question-title">Your available capacity.</h2>' +
@@ -304,7 +310,7 @@
       '</div>';
   }
 
-  // ── Step 6 — Obstacle ────────────────────────────────────────────────────────
+  // ── Step 9 — Obstacle ────────────────────────────────────────────────────────
   function renderObstacleStep() {
     return '<h2 class="question-title">What is your biggest obstacle right now?</h2>' +
       '<p class="question-sub">Describe in a few sentences what\'s blocking you the most. This is what your plan will speak to directly.</p>' +
@@ -315,10 +321,9 @@
   }
 
   // ── Pillar group helper ──────────────────────────────────────────────────────
-  function renderPillarGroup(key, label, opts, current) {
+  function renderPillarGroup(key, opts, current) {
     var html = '<div class="pillar-group">';
-    html += '<div class="pillar-label">' + esc(label) + '</div>';
-    html += '<ul class="card-list" role="radiogroup" aria-label="' + esc(label) + '">';
+    html += '<ul class="card-list" role="radiogroup" aria-label="' + esc(key) + '">';
     opts.forEach(function (opt) {
       var sel = String(current) === opt.value ? ' selected' : '';
       html += '<li>' +
@@ -424,8 +429,8 @@
     html += '</div>';
 
     // Section C — 3-Horizon plan
-    var thisWeek   = (plan.this_week && Array.isArray(plan.this_week)) ? plan.this_week : [];
-    var thisMonth  = plan.this_month  || {};
+    var thisWeek    = (plan.this_week && Array.isArray(plan.this_week)) ? plan.this_week : [];
+    var thisMonth   = plan.this_month  || {};
     var threeMonths = plan.three_months || {};
 
     html += '<div class="plan-section" id="plan-section">';
@@ -526,7 +531,6 @@
   }
 
   function renderRadarSVG(scores, priorityKey) {
-    // grid lines at r=1/3, 2/3, 3/3 of MAX_R
     var grid = '';
     [1, 2, 3].forEach(function (level) {
       var gPts = PILLARS.map(function (_, i) {
@@ -536,7 +540,6 @@
       grid += '<polygon points="' + gPts + '" fill="none" stroke="rgba(28,43,58,0.12)" stroke-width="1"/>';
     });
 
-    // axis lines from center to outer vertex
     var axes = '';
     PILLARS.forEach(function (_, i) {
       var angle = pillarAngle(i);
@@ -544,25 +547,18 @@
       axes += '<line x1="' + CX + '" y1="' + CY + '" x2="' + outer[0].toFixed(1) + '" y2="' + outer[1].toFixed(1) + '" stroke="rgba(28,43,58,0.10)" stroke-width="1"/>';
     });
 
-    // filled polygon — starts at center, animated by JS
     var polygon = '<polygon id="radar-polygon" points="' + CX + ',' + CY + ' ' + CX + ',' + CY + ' ' + CX + ',' + CY + ' ' + CX + ',' + CY + ' ' + CX + ',' + CY + '" fill="rgba(240,165,0,0.25)" stroke="#F0A500" stroke-width="2" stroke-linejoin="round"/>';
 
-    // axis labels
     var labels = '';
     PILLARS.forEach(function (pillar, i) {
       var angle = pillarAngle(i);
       var lp    = polarToCart(CX, CY, LABEL_R, angle);
       var lx    = lp[0], ly = lp[1];
-
-      // text-anchor: top (i=0) and bottom (i=2,3) → middle; right (i=1) → start; left (i=4) → end
       var anchor   = (i === 0 || i === 2 || i === 3) ? 'middle' : (i === 1 ? 'start' : 'end');
-      // dominant-baseline: bottom labels → hanging; top → auto; sides → middle
       var baseline = (i === 2 || i === 3) ? 'hanging' : (i === 0 ? 'auto' : 'central');
-
       var isPriority = pillar.key === priorityKey;
-      var color = isPriority ? '#F0A500' : '#1C2B3A';
+      var color  = isPriority ? '#F0A500' : '#1C2B3A';
       var weight = isPriority ? '700' : '600';
-
       labels += '<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '"' +
         ' text-anchor="' + anchor + '"' +
         ' dominant-baseline="' + baseline + '"' +
@@ -572,8 +568,6 @@
         ' fill="' + color + '">' +
         esc(pillar.label) +
       '</text>';
-
-      // Score dot on the axis
       var score = scores[pillar.key] || 1;
       var dotR  = (score / 3) * MAX_R;
       var dp    = polarToCart(CX, CY, dotR, angle);
@@ -585,8 +579,8 @@
     '</svg>';
   }
 
-  // ── Radar animation: interpolate polygon from center to final scores ──────────
-  function animateRadar(scores, priorityKey) {
+  // ── Radar animation ───────────────────────────────────────────────────────────
+  function animateRadar(scores) {
     var polygon = document.getElementById('radar-polygon');
     if (!polygon) return;
 
@@ -596,21 +590,15 @@
       return polarToCart(CX, CY, r, pillarAngle(i));
     });
 
-    var startTime  = null;
-    var duration   = 900;
+    var startTime = null, duration = 900;
 
     function frame(timestamp) {
       if (!startTime) startTime = timestamp;
       var progress = Math.min((timestamp - startTime) / duration, 1);
-      // ease-out cubic
       var t = 1 - Math.pow(1 - progress, 3);
-
       var pts = targetPts.map(function (tp) {
-        var x = CX + (tp[0] - CX) * t;
-        var y = CY + (tp[1] - CY) * t;
-        return x.toFixed(1) + ',' + y.toFixed(1);
+        return (CX + (tp[0] - CX) * t).toFixed(1) + ',' + (CY + (tp[1] - CY) * t).toFixed(1);
       }).join(' ');
-
       polygon.setAttribute('points', pts);
       if (progress < 1) requestAnimationFrame(frame);
     }
@@ -628,7 +616,7 @@
 
     if (step === 'error') {
       var retryBtn = document.getElementById('btn-retry');
-      if (retryBtn) retryBtn.addEventListener('click', function () { render(7, 'forward'); });
+      if (retryBtn) retryBtn.addEventListener('click', function () { render(10, 'forward'); });
       return;
     }
 
@@ -637,7 +625,8 @@
     if (btnNext) btnNext.addEventListener('click', function () { goNext(step); });
     if (btnBack) btnBack.addEventListener('click', function () { goBack(step); });
 
-    // Opt-card clicks (covers pillar cards and capacity cards)
+    var isPillarStep = (step >= 3 && step <= 7);
+
     document.querySelectorAll('.opt-card').forEach(function (card) {
       card.addEventListener('click', function () {
         var name  = this.dataset.name;
@@ -650,23 +639,23 @@
         this.classList.add('selected');
         this.setAttribute('aria-checked', 'true');
 
-        // Pillar scores are numeric (1–3); other keys are strings
-        var isPillar = (name in answers && typeof answers[name] === 'number') ||
-                       ['positioning','offer','video_content','sales_system','partnerships'].indexOf(name) !== -1;
+        var isPillar = ['positioning','offer','video_content','sales_system','partnerships'].indexOf(name) !== -1;
         answers[name] = isPillar ? parseInt(value, 10) : value;
 
-        // Clear step-level errors
-        clearError('pillars135-error');
-        clearError('pillars46-error');
+        clearError('pillar-error');
         clearError('hours-error');
         clearError('team-error');
+
+        // Auto-advance on pillar steps
+        if (isPillarStep) {
+          setTimeout(function () { goNext(step); }, 180);
+        }
       });
     });
 
-    // Text inputs
-    bindTextInput('input-email',    'email',    step, true);
-    bindTextInput('input-expertise','expertise',step, false);
-    bindTextInput('input-obstacle', 'obstacle', step, false);
+    bindTextInput('input-email',     'email',    step, true);
+    bindTextInput('input-expertise', 'expertise', step, false);
+    bindTextInput('input-obstacle',  'obstacle',  step, false);
   }
 
   function bindTextInput(id, key, step, enterAdvances) {
@@ -693,7 +682,7 @@
     if (step < TOTAL_STEPS) {
       render(step + 1, 'forward');
     } else {
-      render(7, 'forward'); // → loading
+      render(10, 'forward');
     }
   }
 
@@ -718,18 +707,36 @@
         }
         return true;
       case 3:
-        if (!answers.positioning || !answers.offer || !answers.video_content) {
-          showError('pillars135-error', 'Please select one option for each pillar above.');
+        if (!answers.positioning) {
+          showError('pillar-error', 'Please select an option to continue.');
           return false;
         }
         return true;
       case 4:
-        if (!answers.sales_system || !answers.partnerships) {
-          showError('pillars46-error', 'Please select one option for each pillar above.');
+        if (!answers.offer) {
+          showError('pillar-error', 'Please select an option to continue.');
           return false;
         }
         return true;
       case 5:
+        if (!answers.video_content) {
+          showError('pillar-error', 'Please select an option to continue.');
+          return false;
+        }
+        return true;
+      case 6:
+        if (!answers.sales_system) {
+          showError('pillar-error', 'Please select an option to continue.');
+          return false;
+        }
+        return true;
+      case 7:
+        if (!answers.partnerships) {
+          showError('pillar-error', 'Please select an option to continue.');
+          return false;
+        }
+        return true;
+      case 8:
         if (!answers.hours_per_week) {
           showError('hours-error', 'Please select how many hours you have available.');
           return false;
@@ -739,7 +746,7 @@
           return false;
         }
         return true;
-      case 6:
+      case 9:
         if (!answers.obstacle || answers.obstacle.length < 5) {
           showError('obstacle-error', 'This field is needed to personalize your plan.');
           return false;
@@ -786,11 +793,9 @@
       }, 400);
     }, 3500);
 
-    // Fire webhook non-blocking
     fireWebhook();
 
     if (PROXY_URL.indexOf('placeholder') !== -1) {
-      // Dev mode — use mock after simulated delay
       setTimeout(function () {
         clearInterval(interval);
         renderResults(MOCK_RESPONSE);
@@ -819,11 +824,10 @@
   }
 
   function callProxy(payload, interval) {
-    var timeout    = 45000;
     var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-    var timer      = setTimeout(function () {
+    var timer = setTimeout(function () {
       if (controller) controller.abort();
-    }, timeout);
+    }, 45000);
 
     var opts = {
       method:  'POST',
@@ -874,7 +878,6 @@
       .replace(/'/g, '&#39;');
   }
 
-  // Converts *session name* Markdown italic to <em> tags (safe — only inside *)
   function renderMarkdownItalic(str) {
     if (!str) return '';
     return esc(str).replace(/\*([^*]+)\*/g, '<em>$1</em>');
