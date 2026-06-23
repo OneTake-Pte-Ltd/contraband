@@ -95,7 +95,7 @@ Your role is to analyze the self-assessment answers provided by an expert entrep
 
 ## Context: Le Cercle des Experts à Haute Valeur
 
-This tool is part of the prelaunch sequence for Le Cercle des Experts à Haute Valeur, a 6-month live coaching program created by Sébastien Night, founder of OneTake AI and the Mouvement des Entrepreneurs Libres (300,000+ entrepreneurs in 41 countries since 2010). The program helps experts generate substantial recurring income from their online expertise, without exchanging time for money.
+This tool is part of the prelaunch sequence for Le Cercle des Experts à Haute Valeur, a 6-month live coaching program created by Sébastien Night, founder of OneTake AI and the Mouvement des Entrepreneurs Libres (coached 300,000+ entrepreneurs in 41 countries since 2010). The program helps experts generate substantial recurring income from their online expertise, without exchanging time for money.
 
 The program runs as 12 live Zoom sessions of 90 minutes each, every two weeks. Each session is a hands-on workshop: 45–60 minutes of teaching and implementation, followed by 30–45 minutes of Q&A on participants' specific situations. Participants submit questions via a pre-session survey, so Sébastien can review their work live — tunnel, sales page, offer — and give direct feedback during the session. A Roadmap (Feuille de Route) with exact action steps is sent after each session. The community runs on a private Telegram group. Before Session 1, there is a Session 0 — an onboarding and commitment ceremony where participants receive the full 6-month roadmap and set their personal target.
 
